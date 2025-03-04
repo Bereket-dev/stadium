@@ -8,14 +8,22 @@ $password = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST["username"])) {
-        $username = $_POST["username"];
+        $username = trim($_POST["username"]);
     }
     if (isset($_POST["email"])) {
-        $email = $_POST["email"];
+        $email = trim($_POST["email"]);
     }
     if (isset($_POST["password"])) {
-        $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
+        $password = trim($_POST["password"]);
     }
+
+    if (empty($username) || empty($email) || empty($password)) {
+        echo "Data field needed!";
+        goto jump_here;
+    }
+
+
+
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
@@ -28,6 +36,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     } else {
         $stmt->close();
+
+        $passwordPattern = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/";
+
+        if (!preg_match($passwordPattern, $password)) {
+            echo "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.";
+            goto jump_here;
+        }
+
+        $password = password_hash($password, PASSWORD_DEFAULT);
 
         $stmt = $conn->prepare("INSERT INTO users(username, email, password_hash) VALUES(?, ?, ?)");
         $stmt->bind_param("sss", $username, $email, $password);
@@ -44,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-
+jump_here:
 ?>
 
 <form method="post">
