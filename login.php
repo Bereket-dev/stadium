@@ -8,13 +8,18 @@ $password = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST["username"])) {
-        $username = $_POST["username"];
+        $username = trim($_POST["username"]);
     }
     if (isset($_POST["email"])) {
-        $email = $_POST["email"];
+        $email = trim($_POST["email"]);
     }
     if (isset($_POST["password"])) {
-        $password = $_POST["password"];
+        $password = trim($_POST["password"]);
+    }
+
+    if (empty($username) || empty($password)) {
+        echo "Data field needed!";
+        goto jump_here;
     }
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? ");
@@ -23,22 +28,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
+    $stmt->close();
 
     if (password_verify($password, $row["password_hash"])) {
+
         session_start();
         $_SESSION["username"] = $row["username"];
-        $stmt->close();
-        $conn->close();
-        header("Location: dashboard.php");
-        exit();
+        $_SESSION["roles"] = $row["roles"];
+
+        if ($row["roles"] == "admin") {
+            header("Location: admin_dashboard.php");
+            exit();
+        } else if ($row["roles"] == "user") {
+            header("Location: dashboard.php");
+            exit();
+        }
+
+        echo "no role!";
     } else {
         echo "Invalid username or password!";
     }
-
-    $stmt->close();
+    jump_here:
+    $conn->close();
 }
-$conn->close();
-
 ?>
 
 <form method="post">
