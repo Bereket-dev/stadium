@@ -21,4 +21,9 @@ files format/
         |-- login.php
         |-- logout.php
         |-- register.php
+
+
+|-- database/
+        |-- db.php
+
         
