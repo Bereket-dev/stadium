@@ -1,5 +1,5 @@
 <?php
-include("db.php");
+include("../database/db.php");
 
 $username = "";
 $email = "";
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION["roles"] = $row["roles"];
 
         if ($row["roles"] == "admin") {
-            header("Location: admin_dashboard.php");
+            header("Location: ../admin/admin_dashboard.php");
             exit();
         } else if ($row["roles"] == "user") {
             header("Location: dashboard.php");
