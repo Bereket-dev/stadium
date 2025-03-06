@@ -1,6 +1,5 @@
 <?php
-include("./includes/header.admin.html"); // include header
-include("../database/db.php"); // include database connection
+include "./includes/header.admin.php";
 //intialize stadium data variable
 $stadium_name = "";
 $stadium_address = "";
@@ -47,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["event_description"])) {
         $event_description = trim($_POST["event_description"]);
     }
-    if(isset($_POST["layout_image"])) {
+    if (isset($_POST["layout_image"])) {
         $layout_image = $_POST["layout_image"];
     }
 
@@ -125,7 +124,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $stmt->close();
 
-
+    for ($num = 0; $num < $seat_amount; $num++) {
+        $stmt = $conn->prepare("INSERT INTO seats(stadium_id, seat_type, event_id) VALUES(?, ?, ?)");
+        $stmt->bind_param("isi", $stadium_id, $seat_name, $event_id);
+        $stmt->execute();
+        $stmt->close();
+    }
     $conn->close();
 }
 

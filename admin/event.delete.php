@@ -1,7 +1,5 @@
 <?php
-include("../database/db.php");
-include("./includes/header.admin.html");
-
+include "./includes/header.admin.php";
 
 $event_id = "";
 
