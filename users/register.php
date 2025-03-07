@@ -1,5 +1,5 @@
 <?php
-include("db.php");
+include("../database/db.php");
 
 $username = "";
 $email = "";
@@ -25,14 +25,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? OR username = ?");
+    $stmt->bind_param("ss", $email, $username);
     $stmt->execute();
 
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        echo "Email has been used first!";
+        echo "Use unique email and username!";
         $stmt->close();
     } else {
         $stmt->close();
