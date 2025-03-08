@@ -1,5 +1,7 @@
 <?php
-include("../database/db.php");
+include("./database/db.php");
+
+$log = "login";
 
 $username = "";
 $email = "";
@@ -55,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["username"] = $username;
             $stmt->close();
             $conn->close();
-            header("Location: dashboard.php");
+            header("Location: ./users/dashboard.php");
             exit();
         }
     }
@@ -79,6 +81,7 @@ jump_here:
         <label for="password">Password: </label>
         <input type="password" id="password" name="password" required>
     </div>
+    <div class="m-3"><a href="./login.php">login</a></div>
     <br>
     <input type="submit">
 </form>

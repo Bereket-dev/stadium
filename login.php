@@ -1,5 +1,6 @@
 <?php
-include("../database/db.php");
+include("./database/db.php");
+
 
 $username = "";
 $email = "";
@@ -40,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: ../admin/admin_dashboard.php");
             exit();
         } else if ($row["roles"] == "user") {
-            header("Location: dashboard.php");
+            header("Location: ./users/dashboard.php");
             exit();
         }
 
@@ -63,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="password">Password: </label>
         <input type="password" id="password" name="password" required>
     </div>
+    <div class="m-3">create acount? <a href="./register.php">signup</a></div>
     <br>
     <input type="submit">
 </form>

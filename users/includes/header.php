@@ -2,12 +2,12 @@
 session_start(); //to check the user was logged in
 include '../database/db.php';
 
-
 if (!isset($_SESSION['username']) || !isset($_SESSION["roles"])) {
   header("Location: ../login.php");
   exit();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -80,18 +80,11 @@ if (!isset($_SESSION['username']) || !isset($_SESSION["roles"])) {
             </ul>
           </li>
         </ul>
-        <form class="d-flex">
-          <input
-            class="form-control me-2"
-            type="search"
-            placeholder="Search"
-            aria-label="Search" />
-          <button class="btn btn-outline-success" type="submit">
-            Search
-          </button>
-        </form>
+        <div class="d-flex align-items-center gap-3">
+          <a href="../login.php" class="btn btn-outline-success">login</a>
+          <a href="../register.php" class="btn btn-success">Signup</a>
+        </div>
       </div>
-    </div>
   </nav>
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"

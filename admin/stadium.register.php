@@ -75,6 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ss", $stadium_name, $event_name);
     $stmt->execute();
 
+
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
@@ -124,9 +125,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $stmt->close();
 
+    $seat_number = 0;
     for ($num = 0; $num < $seat_amount; $num++) {
-        $stmt = $conn->prepare("INSERT INTO seats(stadium_id, seat_type, event_id) VALUES(?, ?, ?)");
-        $stmt->bind_param("isi", $stadium_id, $seat_name, $event_id);
+        $seat_number++;
+        $stmt = $conn->prepare("INSERT INTO seats(stadium_id, seat_type, event_id, seat_number) VALUES(?, ?, ?, ?)");
+        $stmt->bind_param("isii", $stadium_id, $seat_name, $event_id, $seat_number);
         $stmt->execute();
         $stmt->close();
     }
