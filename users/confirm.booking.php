@@ -6,7 +6,6 @@ $first_name = "";
 $last_name = "";
 $stadium_name = "";
 $event_name = "";
-//$event_date = "";
 $seat_type  = "";
 $seat_number = "";
 $seat_price = "";
@@ -32,11 +31,6 @@ $last_name = $row["last_name"];
 $seat_name  = $row["seat_type"];
 $seat_price = $row["price"];
 $booking_qr  =  $row["qr_code"];
-$email_address = $row["email_address"];
-
-$fullName = $first_name . " " . $last_name;
-
-
 
 $seat_id = $row["seat_id"];
 $event_id = $row["event_id"];
@@ -112,5 +106,3 @@ $conn->close();
 
 <?php 
 
-
-include '../email.script.php';
