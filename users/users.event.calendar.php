@@ -3,6 +3,9 @@ include './includes/header.php';
 
 
 
+
+
+
 $event_result = $conn->query("SELECT * FROM events");
 
 echo '<div class="container">';
@@ -21,7 +24,7 @@ while ($event_row = $event_result->fetch_assoc()) {  // Use while loop instead o
         echo '<div class="col-auto m-2">';
         echo '<div class="card" style="width: 18rem;">';
         echo '<img src="" style="height: 100px; width: 100%;" class="card-img-top" alt="...">';
-        echo '<div class="scard-body p-2">';
+        echo '<div class="card-body p-2">';
         echo '<h5 class="card-title">';
 
         echo "<br>" . $event_row["event_name"] . "<br>";
