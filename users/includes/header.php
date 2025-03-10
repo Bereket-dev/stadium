@@ -1,6 +1,6 @@
 
 
-<nav class="navbar navbar-expand-lg navbar-dark position-fixed" style="width: 100%; background-color:rgba(143, 135, 135, 0.23);">
+<nav class="navbar navbar-expand-lg navbar-dark position-fixed" style="top: 0; width: 100%; background-color:rgba(143, 135, 135, 0.23);">
   <div class="container">
     <a class="navbar-brand" href="#" style="font-size: 30px;">STADIUM</a>
     <button
@@ -28,13 +28,13 @@
             aria-expanded="false"  style="color: white;" >
             EVENT & TICKETS
           </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown"  style="color: white;" >
             <li>
               <a
-                class="dropdown-item"  style="color: white;" 
+                class="dropdown-item" 
                 href="../users/users.event.calendar.php">Events Calendar</a>
             </li>
-            <li><a class="dropdown-item" href="#"  style="color: white;" >Tickets Terms</a></li>
+            <li><a class="dropdown-item" href="#" >Tickets Terms</a></li>
           </ul>
         </li>
         <li class="nav-item">

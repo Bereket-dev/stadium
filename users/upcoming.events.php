@@ -1,5 +1,4 @@
 <?php
-
 include './database/db.php';
 
 $result = $conn->query("SELECT * FROM events");
@@ -18,16 +17,36 @@ $maxEvents = min(3, count($eventArray));
 echo '<div class="d-flex justify-content-center gap-2">';
 for ($i = 0; $i < $maxEvents; $i++) {
     $event = $eventArray[$i];
-    echo '<div class="col-auto m-2">';
-    echo '<div class="card" style="width: 18rem;">';
-    echo '<img src="../assets/Images/uploaded/' . $event["layout_image"] . '" style="height: 100px; width: 100%;" class="card-img-top image-fluid" alt="...">';
-    echo '<div class="card-body p-2">';
-    echo '<h5 class="card-title">';
 
-    echo "<br>" . $event["event_name"] . "<br>";
-    echo '</h5>';
-    echo '<p class="card-text">' . $event["event_description"] . '</p>';
-    echo '<a href="./booking.php?id=' . $event["id"] . '" class="btn btn-primary me-2" style="font-size: 14px;">Book Ticket</a>';
-    echo '</div></div></div>';
+
+    $stmt = $conn->prepare("SELECT * FROM stadiums WHERE id = ?");
+    $stmt->bind_param("i", $event["stadium_id"]);
+    $stmt->execute();
+    $stadium = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    $stmt = $conn->prepare("SELECT * FROM seats WHERE event_id = ?");
+    $stmt->bind_param("i", $event["id"]);
+    $stmt->execute();
+    $seat = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    echo '<div class="col-auto m-2">';
+    echo '<div class="card" >';
+    echo '<img src="../assets/Images/uploaded/' . $event["layout_image"] . '" style="width: 100%;" class="card-img-top image-fluid" alt="...">';
+    echo '<div class="card-body p-2">';
+    echo '<h5 class="card-title">' . ucwords($event["event_name"]) . '</h5>';
+    echo '<div class="stadium-card-name">';
+    echo '<img src="../assets/Images/uploaded/' . $event["layout_image"] . '"  class="card-img-icon image-fluid" alt="...">';
+    echo '<span class="stadium-name">' . ucwords($stadium["stadium_name"]) . '</span>';
+    echo '</div>';
+    echo '<p class="card-text" style="font-size: 15px;">';
+    echo '<span style="font-weight:bold;">'. ucwords($stadium["region"]) . '. ' . ucfirst($stadium["city"]) .  '</span>';
+    echo ' ( ' . $event["event_date"] . ' )' . '</p>';
+    echo '<div class="horizontal-line"></div>';
+    echo '<div class="d-flex justify-content-between align-items-end">';
+    echo '<a href="../users/booking.php?id=' . $event["id"]  . "&seattype_id=" . $seat["seattype_id"] . '" class="btn btn-primary me-2" style="font-size: 14px;">Book Ticket</a>';
+    echo '<a href="../users/users.event.calendar.php">Learn More -></a>';
+    echo '</div></div></div></div>';
 }
 echo '</div>';

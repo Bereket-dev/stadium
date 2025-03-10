@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: ../admin/admin_dashboard.php");
             exit();
         } else if ($row["roles"] == "user") {
-            header("Location: ./users/dashboard.php");
+            header("Location: ../index.php");
             exit();
         }
 
@@ -53,18 +53,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close();
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
 
-<form method="post">
-    <div>
-        <label for="username">Username: </label>
-        <input type="text" id="username" name="username" required>
-    </div>
-    <br>
-    <div>
-        <label for="password">Password: </label>
-        <input type="password" id="password" name="password" required>
-    </div>
-    <div class="m-3">create acount? <a href="./register.php">signup</a></div>
-    <br>
-    <input type="submit">
-</form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stadium</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+        crossorigin="anonymous" />
+    <link rel="stylesheet" href="../assets/css/styles.css">
+
+</head>
+
+<body>
+
+    <form method="post" class="mx-auto my-5 login-form" style="width: 500px;">
+        <!--- username -->
+        <div class="mb-3">
+            <label for="usernameInput" class="form-label">Username</label>
+            <input type="text" class="form-control" id="usernameInput" name="username" aria-describedby="" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="passwordInput" class="form-label">Password</label>
+            <input type="password" class="form-control" id="passwordInput" name="password" aria-describedby="" required>
+        </div>
+
+
+
+        <div class="">Create an acount? <a href="./register.php">signup</a></div>
+        <br>
+        <button type="submit" class="btn btn-primary">login</button>
+    </form>
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
