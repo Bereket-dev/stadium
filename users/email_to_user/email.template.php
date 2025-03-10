@@ -1,5 +1,6 @@
 <?php
-function getEmailTemplate($fullName, $event_name, $event_id, $seat_number): string {
+function getEmailTemplate($fullName, $event_name, $event_date, $seat_type, $seat_number, $booking_qr): string
+{
     return "
     <html>
     <head>
@@ -21,8 +22,11 @@ function getEmailTemplate($fullName, $event_name, $event_id, $seat_number): stri
             
             <div class='details'>
                 <p><strong>Event:</strong> $event_name</p>
-                <p><strong>Date:</strong> $event_id</p>
+                <p><strong>Date:</strong> $event_date</p>
+                <p><strong>Seat Type:</strong> $seat_type</p>
                 <p><strong>Seat Number:</strong> $seat_number</p>
+                <br>
+                <img src = '$booking_qr' alt = 'qr code'/>
             </div>
             
             <p>If you have any questions, please contact our support team.</p>

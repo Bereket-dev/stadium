@@ -68,13 +68,17 @@ $result = $conn->query($sql);
 $sql = "CREATE TABLE `seats` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `stadium_id` int(11) NOT NULL,
-  `seat_type` varchar(10) NOT NULL,
+  `seattype_id` int(11) NOT NULL,
   `seat_status` enum('available','booked','selected') NOT NULL DEFAULT 'available',
   `event_id` int(11) NOT NULL,
   `seat_number` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `stadium_id` (`stadium_id`),
-  CONSTRAINT `seat_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
+  KEY `event_id` (`event_id`),
+  KEY `seattype_id` (`seattype_id`),
+  CONSTRAINT `seat_ibfk_1` FOREIGN KEY (`stadium_id`) REFERENCES `stadiums` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `seat_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `seat_ibfk_3` FOREIGN KEY (`seattype_id`) REFERENCES `seattype` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ";
 $result = $conn->query($sql);
