@@ -21,7 +21,7 @@ include './includes/auth.user.php';
 
 <body>
     <?php include './includes/header.php'; ?>
-    <div class="event-banner">
+    <div class="event-banner event-banner-calendar">
         <div class="container">
             <div class="calling-text" style="color: white;width: 50%;">
                 <h1>YOUR&nbsp;ENTERTAINMENT IS OUR GOAL</h1>

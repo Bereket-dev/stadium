@@ -30,13 +30,14 @@ try {
     $seat_type = $_SESSION["seat_type"];
     $seat_number = $_SESSION["seat_number"];
     $booking_qr = $_SESSION["booking_qr"];
+    $stadium_name = $_SESSION["stadium_name"];
 
     // Sender & Recipient
     $mail->setFrom('berudere036@gmail.com', 'beruder036');
     $mail->addAddress($email_address, $fullName);
 
     // Load Email Template
-    $emailBody = getEmailTemplate($fullName, $event_name, $event_date, $seat_type, $seat_number, $booking_qr);
+    $emailBody = getEmailTemplate($fullName, $stadium_name, $event_name, $event_date, $seat_type, $seat_number, $booking_qr);
 
     // Email Content
     $mail->isHTML(true);

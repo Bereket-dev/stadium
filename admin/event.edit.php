@@ -136,57 +136,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
         crossorigin="anonymous" />
+    <link rel="stylesheet" href="../assets/CSS/styles.css">
 </head>
 
 <body>
-    <?php include "./includes/header.admin.php"; ?>
-    <div class="text-center">
-        <h1>Event Edition</h1>
-    </div>
-    <div class="container p-3" style="max-width: 80vw;">
-        <form class="row g-3" method="post" enctype="multipart/form-data">
+    <!-- side bar -->
+    <?php include './includes/sidebar.html'; ?>
 
-            <div class="col-md-6">
-                <label for="inputAddress" class="form-label">Event</label>
-                <input type="text" class="form-control" name="event_name" id="inputEvent" placeholder="World Cup" required>
-            </div>
-            <div class="col-md-6">
-                <label for="inputAddress2" class="form-label">Event Date</label>
-                <input type="datetime-local" class="form-control" name="event_date" id="inputAddress2" placeholder="Apartment, studio, or floor" required>
-            </div>
+    <div class="content">
+        <div class="text-center ">
+            <h1>Event Edition</h1>
+        </div>
+        <div class="container  p-3" style="max-width: 80vw;">
+            <form class="row g-3" method="post" enctype="multipart/form-data">
 
-            <div class="col-md-2">
-                <label for="inputState" class="form-label">Seat Type</label>
-                <select name="seat_type" id="inputState" class="form-select" required>
-                    <option selected>Choose...</option>
-                    <option value="vip">VIP</option>
-                    <option value="viip">VIIP</option>
-                    <option value="normal">NORMAL</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="inputZip" class="form-label">Amount</label>
-                <input type="number" name="seat_amount" placeholder="total seat" min="0" class="form-control" id="" required>
-            </div>
-            <div class="col-md-2">
-                <label for="inputZip" class="form-label">PRICE</label>
-                <input type="number" name="seat_price" placeholder="each price" min="0" class="form-control" id="" required>
-            </div>
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <textarea class="form-control mt-3" name="event_description" placeholder="Leave a description here" id="floatingTextarea"></textarea>
-                    <label for="floatingTextarea">Event Description</label>
+                <div class="col-md-6">
+                    <label for="inputAddress" class="form-label">Event</label>
+                    <input type="text" class="form-control" name="event_name" id="inputEvent" placeholder="World Cup" required>
                 </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="formFile" class="form-label">Event image</label>
-                <input class="form-control" name="image" type="file" id="formFile">
-            </div>
+                <div class="col-md-6">
+                    <label for="inputAddress2" class="form-label">Event Date</label>
+                    <input type="datetime-local" class="form-control" name="event_date" id="inputAddress2" placeholder="Apartment, studio, or floor" required>
+                </div>
 
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
+                <div class="col-md-2">
+                    <label for="inputState" class="form-label">Seat Type</label>
+                    <select name="seat_type" id="inputState" class="form-select" required>
+                        <option selected>Choose...</option>
+                        <option value="vip">VIP</option>
+                        <option value="viip">VIIP</option>
+                        <option value="normal">NORMAL</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="inputZip" class="form-label">Amount</label>
+                    <input type="number" name="seat_amount" placeholder="total seat" min="0" class="form-control" id="" required>
+                </div>
+                <div class="col-md-2">
+                    <label for="inputZip" class="form-label">PRICE</label>
+                    <input type="number" name="seat_price" placeholder="each price" min="0" class="form-control" id="" required>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <textarea class="form-control mt-3" name="event_description" placeholder="Leave a description here" id="floatingTextarea"></textarea>
+                        <label for="floatingTextarea">Event Description</label>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="formFile" class="form-label">Event image</label>
+                    <input class="form-control" name="image" type="file" id="formFile">
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
     </div>
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"

@@ -30,9 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 }
 
 $event_id = $_SESSION["event_id"] ?? null;
-$seat_price = $_SESSION["seat_price"] ?? null;
-$seat_name = $_SESSION["seat_name"] ?? null;
-$seattype_id = $_SESSION["seattype_id"] ?? null;
+// $seat_name = $_SESSION["seat_name"] ?? null;
+// $seattype_id = $_SESSION["seattype_id"] ?? null;
 
 // Fetch event details
 $stmt = $conn->prepare("SELECT * FROM events WHERE id = ?");
@@ -40,6 +39,8 @@ $stmt->bind_param("i", $event_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $event = $result->fetch_assoc();
+$event_name = $event["event_name"] ?? null;
+$event_image = $event['layout_image'];
 $stmt->close();
 
 if (!$event) {
@@ -52,7 +53,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $first_name = trim($_POST["first_name"] ?? "");
     $last_name = trim($_POST["last_name"] ?? "");
     $email_address = trim($_POST["email_address"] ?? "");
-
+    $quantity = $_POST["quantity"] ?? null;
+    if (!$quantity) {
+        echo "no quantity post";
+    }
+    $price = $_POST["price"] ?? null;
+    if (!$price) {
+        echo 'no price post';
+    }
     if (empty($first_name) || empty($last_name) || empty($email_address)) {
         echo "All fields are required";
         goto form;
@@ -65,8 +73,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $event_id = $_SESSION["event_id"] ?? null;
     $seat_price = $_SESSION["seat_price"] ?? null;
+    $seat_price *= $quantity;
     $seat_name = $_SESSION["seat_name"] ?? null;
     $seattype_id = $_SESSION["seattype_id"] ?? null;
+
+
 
     // Fetch user ID
     $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
@@ -80,10 +91,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Fetch available seat
-    $stmt = $conn->prepare("SELECT id, stadium_id FROM seats WHERE seattype_id = ? AND seat_status = 'available' AND event_id = ? LIMIT 1");
+    $stmt = $conn->prepare("SELECT id, stadium_id FROM seats WHERE seattype_id = ? AND seat_status = 'available' AND event_id = ? LIMIT $quantity");
     $stmt->bind_param("ii", $seattype_id, $event_id);
     $stmt->execute();
-    $seat = $stmt->get_result()->fetch_assoc();
+    $result = $stmt->get_result();
+
+    $seat_ids = "";//initiallize
+    while ($seat = $result->fetch_assoc()) {
+        $seat_id = $seat["id"];
+        $seat_ids .= $seat_id . ", ";
+    }
     $stmt->close();
 
     if (!$seat) {
@@ -91,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         goto form;
     }
 
-    $seat_id = $seat["id"];
+
     $stadium_id = $seat["stadium_id"];
 
     // Fetch stadium name
@@ -101,16 +118,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stadium_name = $stmt->get_result()->fetch_assoc()["stadium_name"] ?? "Unknown";
     $stmt->close();
 
-    // Fetch event name
-    $stmt = $conn->prepare("SELECT event_name FROM events WHERE id = ?");
-    $stmt->bind_param("i", $event_id);
-    $stmt->execute();
-    $event_name = $stmt->get_result()->fetch_assoc()["event_name"] ?? "Unknown";
-    $stmt->close();
+
+    if ($seat_price != $price) {
+        exit("Don't try to cheat!");
+    }
 
     // Insert booking record
-    $stmt = $conn->prepare("INSERT INTO bookings (first_name, last_name, email_address, user_id, event_id, seat_id, seat_type, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssiiisi", $first_name, $last_name, $email_address, $user_id, $event_id, $seat_id, $seat_name, $seat_price);
+    $stmt = $conn->prepare("INSERT INTO bookings (first_name, last_name, email_address, user_id, event_id, seat_id, seat_type, quantity, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssiiisii", $first_name, $last_name, $email_address, $user_id, $event_id, $seat_ids, $seat_name, $quantity, $seat_price);
     $stmt->execute();
     $booking_id = $stmt->insert_id;
     $stmt->close();
@@ -156,13 +171,52 @@ form:
         rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
         crossorigin="anonymous" />
+    <link rel="stylesheet" href="../assets/CSS/styles.css">
 </head>
 
 <body>
     <!-- Include header with database connection -->
     <?php include './includes/header.php'; ?>
+    <div class="event-banner" style="background-image: url('../assets/Images/uploaded/<?php echo $event_image ?>');">
+        <div class="container">
+            <div class="calling-text" style="color: white;width: 50%;">
+                <h1><?php echo $event_name; ?></h1>
+            </div>
+            <a href="./users/users.event.calendar.php" class="btn btn-primary">Book An Event</a>
+        </div>
+    </div>
 
-    <div class="container col-6 mt-5 p-5" style="box-shadow: 1px 1px 3px black;">
+    <!--ticket selecting area-->
+    <div class="container frames col-6">
+        <div class="row border border-primary p-3">
+            <div class="col-3">Seat Type</div>
+            <div class="col-3">Price</div>
+            <div class="col-3">Quantity</div>
+        </div>
+
+        <?php
+        $stmt = $conn->prepare('SELECT * FROM seattype WHERE event_id = ?');
+        $stmt->bind_param("i", $event_id);
+        $stmt->execute();
+        $results = $stmt->get_result();
+        while ($row = $results->fetch_assoc()) {
+            echo '<div class="row border-bottom border-primary p-3 input-area">';
+            echo '<div class="col-3 stattype-area">' . $row["seat_name"] . '</div>';
+            echo '<div class="col-3">' . $row["seat_price"] . '</div>';
+            echo '<input type="number" class="price-area" value="' . $row["seat_price"] . '" hidden>';
+            echo '<div class="col-3 quantity-area">0</div>';
+            echo '<div class="col-3 row">';
+            echo '<div class="col-4 btn btn-outline-primary remove-ticket">-</div>';
+            echo '<div class="col-4 ms-2 btn btn-primary add-ticket">+</div>';
+            echo '</div></div>';
+        };
+        $stmt->close();
+        ?>
+
+        <div class="mt-3">Total Price <span id="totalPrice">0</span></div>
+    </div>
+    <!-- booking form -->
+    <div class="container col-6 mt-5 p-5 banner-container" style="box-shadow: 1px 1px 3px black;">
         <div class="text-center fs-3 mb-3"><?php echo $event["event_name"]; ?></div>
         <form class="row g-3" method="post" action="">
             <div class="col-md-6">
@@ -185,14 +239,8 @@ form:
                 <input type="email" class="form-control" name="email_address" id="exampleFormControlInput1" placeholder="name@example.com">
             </div>
 
-            <div class="mb-3">
-                PRCIE: <span><?php echo $seat_price . " ETB"; ?></span>
-            </div>
-
-
-            <div class="mb-3" row>
-                SEAT TYPE: <span><?php echo $seat_name; ?></span>
-            </div>
+            <input type="hidden" name="price" id="priceInput">
+            <input type="hidden" name="quantity" id="quantityInput">
 
             <div class="col-12">
                 <div class="form-check">
@@ -211,10 +259,14 @@ form:
             </div>
         </form>
     </div>
+
+    <!-- footer -->
+    <?php include '../includes/footer.php'; ?>
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+    <script src="../assets/js/main.js"></script>
 </body>
 
 </html>

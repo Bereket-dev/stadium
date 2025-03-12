@@ -95,11 +95,47 @@
 }
 
 .event-banner {
-    background-image: url(../Images/banner/action-banner.png);
     height: 442px;
     max-width: 100vw;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
     padding-top: 20px;
+}
+.event-banner-calendar {
+    background-image: url(../Images/banner/action-banner.png);
+}
+
+nav {
+    background-color:rgba(143, 135, 135, 0.23);
+    z-index: 2;
+}
+
+header nav.scrolled {
+    background-color: #0d6efd !important;
+}
+
+header nav.scrolled .navbar-toggler {
+    color: white;
+}
+
+.side_bar {
+    height: 100vh;
+    width: 300px;
+}
+
+.admin_image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.content {
+    margin-left: 300px;
+    padding: 50px 50px 0;
+}
+
+.box-shadow {
+    box-shadow: 5px 5px 10px rgba(184, 180, 180, 0.4);
+    /* box-shadow: -5px -5px 10px white; */
 }

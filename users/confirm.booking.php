@@ -144,6 +144,7 @@ if (!$issent) {
     $_SESSION["seat_number"] = $seat_number;
     $_SESSION["booking_qr"] = $booking_qr;
     $_SESSION["email_address"] = $email_address;
+    $_SESSION["stadium_name"] = $stadium_name;
 
     include './email_to_user/email.script.php';
 } else {
