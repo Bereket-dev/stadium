@@ -2,7 +2,7 @@
 session_start(); //to check the user was logged in
 include '../database/db.php';
 include './includes/auth.user.php';
-
+$message = "";
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
     if (!isset($_GET["id"]) || !filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
@@ -55,14 +55,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email_address = trim($_POST["email_address"] ?? "");
     $quantity = $_POST["quantity"] ?? null;
     if (!$quantity) {
-        echo "no quantity post";
+        $message = "no quantity post";
     }
     $price = $_POST["price"] ?? null;
     if (!$price) {
         echo 'no price post';
     }
     if (empty($first_name) || empty($last_name) || empty($email_address)) {
-        echo "All fields are required";
+        $message = "All fields are required";
         goto form;
     }
 
@@ -91,25 +91,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Fetch available seat
-    $stmt = $conn->prepare("SELECT id, stadium_id FROM seats WHERE seattype_id = ? AND seat_status = 'available' AND event_id = ? LIMIT $quantity");
-    $stmt->bind_param("ii", $seattype_id, $event_id);
+    $stmt = $conn->prepare("SELECT * FROM seats WHERE seattype_id = ? AND seat_status = 'available' AND event_id = ? LIMIT ?");
+    $stmt->bind_param("iii", $seattype_id, $event_id, $quantity);
     $stmt->execute();
     $result = $stmt->get_result();
-
-    $seat_ids = "";//initiallize
+    if ($result->num_rows === 0) {
+        $message = "<div class='text-center'>No available seats.</div>";
+        goto form;
+    } else if ($result->num_rows < $quantity) {
+        $message = 'only ' . $result->num_rows . ' ' . $seat_name . ' seats are available!';
+        goto form;
+    } //initiallize
+    $seat_numArray = [];
+    $seat_idArray = [];
+    $stadium_ids = [];
     while ($seat = $result->fetch_assoc()) {
-        $seat_id = $seat["id"];
-        $seat_ids .= $seat_id . ", ";
+        $seat_numArray[] = $seat["seat_number"];
+        $seat_idArray[] = $seat["id"];
+        $stadium_ids[] = $seat["stadium_id"];
     }
+
+    $seat_numbers = implode(", ", $seat_numArray); // changing array in to string
+
+    $stadium_id = $stadium_ids[0]; //just using only one id since all are similar
     $stmt->close();
 
-    if (!$seat) {
-        echo "<div class='text-center'>No available seats.</div>";
-        goto form;
+
+    // Update seat status
+    foreach ($seat_idArray as $seat_id) {
+        $stmt = $conn->prepare("UPDATE seats SET seat_status = 'selected' WHERE id = ?");
+        $stmt->bind_param("i", $seat_id);
+        $stmt->execute();
+        $stmt->close();
     }
-
-
-    $stadium_id = $seat["stadium_id"];
+    $serilizedData = json_encode($seat_idArray); //serilizing to store it in booking table
 
     // Fetch stadium name
     $stmt = $conn->prepare("SELECT stadium_name FROM stadiums WHERE id = ?");
@@ -124,8 +139,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert booking record
-    $stmt = $conn->prepare("INSERT INTO bookings (first_name, last_name, email_address, user_id, event_id, seat_id, seat_type, quantity, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssiiisii", $first_name, $last_name, $email_address, $user_id, $event_id, $seat_ids, $seat_name, $quantity, $seat_price);
+    $stmt = $conn->prepare("INSERT INTO bookings (first_name, last_name, email_address, user_id, event_id, seat_number, seat_id_data, seat_type, quantity, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssiisssii", $first_name, $last_name, $email_address, $user_id, $event_id, $seat_numbers, $serilizedData, $seat_name, $quantity, $seat_price);
     $stmt->execute();
     $booking_id = $stmt->insert_id;
     $stmt->close();
@@ -140,12 +155,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $stmt->close();
 
-    // Update seat status
-    $stmt = $conn->prepare("UPDATE seats SET seat_status = 'selected' WHERE id = ?");
-    $stmt->bind_param("i", $seat_id);
-    $stmt->execute();
-    $stmt->close();
 
+    $stmt = $conn->prepare("SELECT * FROM bookings WHERE  id = ?");
+    $stmt->bind_param("i", $booking_id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
 
 
     // Redirect to confirmation
@@ -154,7 +170,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     unset($_POST["first_name"]);
     unset($_POST["last_name"]);
 
-    $_SESSION["issent"] = false;
+
     exit();
 }
 form:
@@ -185,7 +201,7 @@ form:
             <a href="./users/users.event.calendar.php" class="btn btn-primary">Book An Event</a>
         </div>
     </div>
-
+    <?php echo '<h1 class ="text-center">' . $message . '</h1>'; ?>
     <!--ticket selecting area-->
     <div class="container frames col-6">
         <div class="row border border-primary p-3">

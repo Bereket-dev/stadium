@@ -1,6 +1,6 @@
 <?php
 include "../database/db.php";
-
+$message = "";
 
 $username = "";
 $email = "";
@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($username) || empty($password)) {
-        echo "Data field needed!";
+        $message = "Data field needed!";
         goto jump_here;
     }
 
@@ -45,9 +45,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
 
-        echo "no role!";
+        $message = "no role!";
     } else {
-        echo "Invalid username or password!";
+        $message =  "Invalid username or password!";
     }
     jump_here:
     $conn->close();
@@ -72,6 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
     <form method="post" class="mx-auto my-5 login-form" style="width: 500px;">
+        <?php echo '<p class="text-center">' . $message . '</p>' ?>
         <!--- username -->
         <div class="mb-3">
             <label for="usernameInput" class="form-label">Username</label>

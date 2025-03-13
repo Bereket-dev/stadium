@@ -4,6 +4,7 @@ include '../database/db.php';
 include './includes/auth.admin.php';
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,73 +32,30 @@ include './includes/auth.admin.php';
             <a href="./event-management.php" class=" text-decoration-none text-white">Event Management</a>
         </div>
     </div>
-    <!-- side bar -->
-    <?php include './includes/sidebar.html'; ?>
-    
+    <!-- side bar and header-->
+    <?php
+    include './includes/sidebar.php';  
+    include './includes/header.admin.php';
+
+    ?>
+
+
     <div class="content">
-        <div class="row text-primary gap-2">
-            <div class="col text-center box-shadow p-3">
-                <div class="">50</div>
-                <div class=" ">Total&nbsp;users</div>
-            </div>
-            <div class="col text-center box-shadow p-3">
-                <div class="">500</div>
-                <div class="">Total&nbsp;bookings</div>
-            </div>
-            <div class="col text-center box-shadow p-3">
-                <div class="">$2000</div>
-                <div class="">Confirmed&nbsp;revenue</div>
-            </div>
-            <div class="col text-center box-shadow p-3">
-                <div class="">$10000</div>
-                <div class="">Projected&nbsp;revenue</div>
-            </div>
-        </div>
-    </div>
-    <div class="content">
-        <div class="row">
-            <div class="col box-shadow">
-                <div class="d-flex justify-content-between p-3">
-                    <div class="text-primary mt-5" style="font-size: 20px;">
-                        St. Georgis Vs Fassil Kenema
-                    </div>
-                    <div class="pie">
-                        <canvas id="myPieChart1" width="220" height="220"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col box-shadow">
-                <div class="d-flex justify-content-between p-3">
-                    <div class="text-primary mt-5" style="font-size: 20px;">
-                        St. Georgis Vs Fassil Kenema
-                    </div>
-                    <div class="pie">
-                        <canvas id="myPieChart2" width="220" height="220"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col box-shadow">
-                <div class="d-flex justify-content-between p-3">
-                    <div class="text-primary mt-5" style="font-size: 20px;">
-                        St. Georgis Vs Fassil Kenema
-                    </div>
-                    <div class="pie">
-                        <canvas id="myPieChart3" width="220" height="220"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col box-shadow">
-                <div class="d-flex justify-content-between p-3">
-                    <div class="text-primary mt-5" style="font-size: 20px;">
-                        St. Georgis Vs Fassil Kenema
-                    </div>
-                    <div class="pie">
-                        <canvas id="myPieChart4" width="220" height="220"></canvas>
-                    </div>
-                </div>
-            </div>
+        <div class="row justify-content-center gap-3">
+            <?php
+            $event_result = $conn->query("SELECT * FROM events");
+
+            while ($event = $event_result->fetch_assoc()) {
+                echo '<div class="col-auto box-shadow" style="width: 500px;">';
+                echo '<div class="d-flex justify-content-between p-3">';
+                echo '<div class="text-primary mt-5" style="font-size: 20px;">';
+                echo $event["event_name"];
+                echo '</div>';
+                echo '<div class="pie">';
+                echo '<canvas class="myPieChart" data-event-id="' . $event["id"] . '" style="width: 255px; height: 255px;"></canvas>'; // Fixed inline styles
+                echo '</div></div></div>';
+            }
+            ?>
         </div>
     </div>
     <script
@@ -111,48 +69,42 @@ include './includes/auth.admin.php';
 
 </body>
 <script>
-    //piechart
-    document.addEventListener("DOMContentLoaded", () => {
-        const ctx1 = document.getElementById("myPieChart1").getContext('2d');
-        const ctx2 = document.getElementById("myPieChart2").getContext('2d');
-        const ctx3 = document.getElementById("myPieChart3").getContext('2d');
-        const ctx4 = document.getElementById("myPieChart4").getContext('2d');
-
-        // Define data correctly
-        const data = {
-            labels: ['Available', 'Pending', 'Booked'],
-            datasets: [{
-                label: 'My First Dataset',
-                data: [300, 50, 100],
-                backgroundColor: [
-                    'rgb(112, 133, 163)',
-                    'rgb(54, 162, 235)',
-                    'rgb(10, 101, 236)'
-                ],
-                hoverOffset: 4
-            }]
-        };
-
-        // Define config correctly
-        const config = {
-            type: 'doughnut',
-            data: data, // Reference data object
-            options: { // Fixed from "Options"
-                plugins: { // Fixed from "Plugins"
-                    legend: {
-                        display: true,
-                        position: 'bottom' // Fixed missing quotes
+    const eventElements = document.querySelectorAll(".myPieChart");
+    eventElements.forEach(eventElement => {
+        const eventId = eventElement.getAttribute("data-event-id"); // Get the event ID
+        fetch(`events_data.php?event_id=${eventId}`)
+            .then(response => response.json())
+            .then(data => {
+                const ctx = eventElement.getContext('2d'); // Use the current element's context
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Available', 'Booked', 'Selected'],
+                        datasets: [{
+                            label: 'Seats Status',
+                            data: [data.available, data.booked, data.selected],
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.6)', // Available - Green
+                                'rgba(255, 99, 132, 0.6)', // Booked - Red
+                                'rgba(255, 206, 86, 0.6)' // Selected - Yellow
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
                     }
-                }
-            }
-        };
-
-        // Create chart correctly
-        new Chart(ctx1, config);
-        new Chart(ctx2, config);
-        new Chart(ctx3, config);
-        new Chart(ctx4, config);
+                });
+            })
+            .catch(error => console.error('Error fetching seat data:', error));
     });
+</script>
+
 </script>
 
 </html>

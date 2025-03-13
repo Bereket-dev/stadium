@@ -21,29 +21,12 @@ include './includes/auth.admin.php';
 </head>
 
 <body>
-    <!-- side bar -->
-    <?php include './includes/sidebar.html'; ?>
-    
-    <div class="content">
-        <div class="row text-primary gap-2">
-            <div class="col text-center box-shadow p-3">
-                <div class="">50</div>
-                <div class=" ">Total&nbsp;users</div>
-            </div>
-            <div class="col text-center box-shadow p-3">
-                <div class="">500</div>
-                <div class="">Total&nbsp;bookings</div>
-            </div>
-            <div class="col text-center box-shadow p-3">
-                <div class="">$2000</div>
-                <div class="">Confirmed&nbsp;revenue</div>
-            </div>
-            <div class="col text-center box-shadow p-3">
-                <div class="">$10000</div>
-                <div class="">Projected&nbsp;revenue</div>
-            </div>
-        </div>
-    </div>
+    <!-- side bar and header-->
+    <?php
+    include './includes/sidebar.php';  
+    include './includes/header.admin.php';
+
+    ?>
     <div class="content">
         <div class="d-flex justify-content-center">
             <?php

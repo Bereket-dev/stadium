@@ -49,7 +49,7 @@ try {
     if (!$mail->send()) {
         error_log("Mail Error: " . $mail->ErrorInfo, 3, "error_log.txt");
     } else {
-        echo 'Confirmation email sent!';
+
         $_SESSION["full_name"] = "";
         $_SESSION["email_address"] = "";
         $_SESSION["event_name"] = "";
@@ -57,7 +57,8 @@ try {
         $_SESSION["seat_type"] = "";
         $_SESSION["seat_number"] = "";
 
-        $_SESSION["issent"] = true; //true prevent repetion of mail sending
+        header("Location: ./book-management.php");
+        exit();
     }
 } catch (Exception $e) {
     echo "Error: {$mail->ErrorInfo}";
