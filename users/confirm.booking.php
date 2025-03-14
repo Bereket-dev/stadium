@@ -14,7 +14,7 @@ $seat_price = "";
 if (isset($_GET["id"]) && filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
     $booking_id = $_GET["id"];
 } else {
-    echo "confirm page doesnt get id";
+    header("Location: booking.php");
     exit();
 }
 
