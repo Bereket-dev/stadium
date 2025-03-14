@@ -84,26 +84,60 @@ include 'db.php';
 // $result = $conn->query($sql);
 
 
-//booking table
-$sql = "CREATE TABLE `bookings` (
+// //booking table
+// $sql = "CREATE TABLE `bookings` (
+//   `id` int(11) NOT NULL AUTO_INCREMENT,
+//   `first_name` varchar(255) NOT NULL,
+//   `last_name` varchar(255) NOT NULL,
+//   `email_address` varchar(255) NOT NULL,
+//   `user_id` int(11) NOT NULL,
+//   `event_id` int(11) NOT NULL,
+//   `seat_number` varchar(255) NOT NULL,
+//   `seat_id_data` text(255) NOT NULL,
+//   `booking_date` datetime DEFAULT current_timestamp(),
+//   `qr_code` varchar(255) DEFAULT NULL,
+//   `seat_type` varchar(255) NOT NULL,
+//   `quantity` int(11) NOT NULL,
+//   `price` int(11) NOT NULL,
+//   `status` enum('pending', 'confirmed','cancelled') NOT NULL DEFAULT 'pending',
+//   `transactionRef` varchar(255) NOT NULL,
+//   PRIMARY KEY (`id`),
+//   KEY `user_id` (`user_id`),
+//   KEY `event_id` (`event_id`),
+//   CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+//   CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
+// ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+// ";
+// $result = $conn->query($sql);
+
+
+// //product table
+// $sql = "CREATE TABLE `products` (
+//   `id` int(11) NOT NULL AUTO_INCREMENT,
+//   `product_name` varchar(255) NOT NULL,
+//   `product_price` int(11) NOT NULL,
+//   `product_amount` int(11) NOT NULL,  
+//   `product_image` longblob NOT NULL,
+//    PRIMARY KEY (`id`)
+// ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+// ";
+// $result = $conn->query($sql);
+
+
+//orders table
+$sql = "CREATE TABLE `orders` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `email_address` varchar(255) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `seat_number` varchar(255) NOT NULL,
-  `booking_date` datetime DEFAULT current_timestamp(),
-  `qr_code` varchar(255) DEFAULT NULL,
-  `seat_type` varchar(255) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `price` int(11) NOT NULL,
-  `status` enum('pending', 'confirmed','cancelled') NOT NULL DEFAULT 'pending',
+  `product_id` int(11) NOT NULL,
+  `status` enum('pending', 'processing','delivered','cancelled') NOT NULL DEFAULT 'pending',
+  `quantity` int(11) NOT NULL, 
+  `total_price` int(11) NOT NULL, 
+  `seat_number` varchar(255) NOT NULL, 
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `event_id` (`event_id`),
-  CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
+  KEY `user_id`(`user_id`),
+  KEY `product_id`(`product_id`),
+  CONSTRAINT `product_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ,
+  CONSTRAINT `product_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ";
 $result = $conn->query($sql);

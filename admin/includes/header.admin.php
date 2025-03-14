@@ -6,12 +6,18 @@ $totalUsers = count($result);
 
 $sql = "SELECT * FROM bookings ";
 $result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
-$totalBookings = count($result);
-
 
 $confirmedRevenue = 0;
 foreach ($result as $row) {
   $confirmedRevenue += (int)$row["price"];
+}
+
+
+$sql = "SELECT * FROM bookings WHERE `status` = 'confirmed'";
+$result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+$totalBookings = 0;
+foreach ($result as $row) {
+  $totalBookings += (int)$row["quantity"];
 }
 
 $sql = "SELECT * FROM seattype ";

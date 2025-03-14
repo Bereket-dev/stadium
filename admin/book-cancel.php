@@ -26,17 +26,17 @@ $stmt->execute();
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
-$seat_idArray = json_decode($row["seat_id_data"], true);
-// Update seat status
-foreach ($seat_idArray as $seat_id) {
-    $stmt = $conn->prepare("UPDATE seats SET seat_status = 'available' WHERE id = ?");
-    $stmt->bind_param("i", $seat_id);
-    $stmt->execute();
-    $stmt->close();
-}
-
 $book_status = $row["status"];
 if ($book_status == 'pending') {
+    $seat_idArray = json_decode($row["seat_id_data"], true);
+    // Update seat status
+    foreach ($seat_idArray as $seat_id) {
+        $stmt = $conn->prepare("UPDATE seats SET seat_status = 'available' WHERE id = ?");
+        $stmt->bind_param("i", $seat_id);
+        $stmt->execute();
+        $stmt->close();
+    }
+
     $stmt = $conn->prepare("UPDATE bookings SET `status` = 'cancelled' WHERE id = ?");
     $stmt->bind_param("i", $booking_id);
     $stmt->execute();
@@ -47,5 +47,6 @@ if ($book_status == 'pending') {
     $stmt->execute();
     $stmt->close();
 }
+$_SESSION["message"] = '';
 header("Location: ./book-management.php");
 exit();

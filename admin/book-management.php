@@ -23,20 +23,25 @@ include './includes/auth.admin.php';
 <body>
     <!-- side bar and header-->
     <?php
-    include './includes/sidebar.php';  
+    include './includes/sidebar.php';
     include './includes/header.admin.php';
-
+    $message = '';
+    if (isset($_SESSION['message'])) {
+        $message = $_SESSION['message'];
+    }
     ?>
 
     <div class="content">
         <div class="p-5 box-shadow">
+            <div class="text-center"><?php echo $message; ?></div>
             <div class="text-center mb-4" style="font-size: 25px;">Book Confirmation</div>
             <div class="row   ">
                 <div class="col">Email</div>
                 <div class="col-2">Date</div>
                 <div class="col-2">Status</div>
-                <div class="col-2"></div>
-                <div class="col-2"></div>
+                <div class="col-2">Transaction Ref</div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
             </div>
             <?php
             $sql = "SELECT * FROM bookings";
@@ -46,8 +51,9 @@ include './includes/auth.admin.php';
                 echo  '<div class="col">' . $row["email_address"] . '</div>';
                 echo    '<div class="col-2">' . $row["booking_date"] . '</div>';
                 echo   '<div class="col-2">' . $row["status"] . '</div>';
-                echo  '<div class="col-2"><a href="./book-cancel.php?id=' . $row["id"] . '" id="" class="btn mt-1  btn-secondary">Cancel</a></div>';
-                echo  '<div class="col-2"><a href="./book-confirm.php?id=' . $row["id"] . '" class="btn mt-1 btn-primary">Confirm</a></div>';
+                echo   '<div class="col-2">' . $row["transactionRef"] . '</div>';
+                echo  '<div class="col-1"><a href="./book-cancel.php?id=' . $row["id"] . '" id="" class="btn mt-1  btn-secondary">Cancel</a></div>';
+                echo  '<div class="col-1"><a href="./book-confirm.php?id=' . $row["id"] . '" class="btn mt-1 btn-primary">Confirm</a></div>';
                 echo '</div>';
             }
             ?>

@@ -22,16 +22,7 @@ include './includes/auth.admin.php';
 </head>
 
 <body>
-    <div class="side_bar position-fixed bg-primary text-white ps-4 py-5">
-        <div class="myacount d-flex align-items-center gap-2">
-            <div class="admin_image position-relative bg-secondary"><img src="" alt="" class="postion-absolut img-fluid"></div>username
-        </div>
-        <div class="mt-5 d-flex flex-column gap-3">
-            <a href="./admin_dashboard.php" class="border-bottom text-decoration-none text-white">Dashboard</a>
-            <a href="./book-management.php" class="border-bottom  text-decoration-none text-white">Booking Management</a>
-            <a href="./event-management.php" class=" text-decoration-none text-white">Event Management</a>
-        </div>
-    </div>
+
     <!-- side bar and header-->
     <?php
     include './includes/sidebar.php';  

@@ -31,7 +31,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="col">
+            <div class="col-auto" style="max-width: 500px;">
                 <div>
                     <h3>About Us</h3>
                     <p>We are dedicated to connecting fans with Ethiopia’s vibrant live events and sporting culture. Our platform brings together information from stadiums across the nation, ensuring you stay informed about local matches, concerts, and community events.</p>

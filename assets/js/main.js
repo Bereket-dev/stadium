@@ -34,7 +34,7 @@ removeTicket.addEventListener("click", () => {
 
 //to give feature on header during scroll
 window.addEventListener("scroll", function () {
-  let header = document.querySelector("nav");
+  let header = document.querySelector("header nav");
   if (window.scrollY > 50) {
     header.classList.add("scrolled");
   } else {
@@ -42,3 +42,19 @@ window.addEventListener("scroll", function () {
   }
 });
 
+function showHiddenForm(productId) {
+  const formElement = document.getElementById("order-form-" + productId);
+  const buyButton = document.querySelector(".order-add-" + productId);
+
+  if (formElement.style.display == "none") {
+    formElement.style.display = "block";
+    buyButton.textContent = "cancel";
+    buyButton.classList.remove("btn-primary");
+    buyButton.classList.add("btn-secondary");
+  } else if (formElement.style.display == "block") {
+    formElement.style.display = "none";
+    buyButton.textContent = "Order ->";
+    buyButton.classList.add("btn-primary");
+    buyButton.classList.remove("btn-secondary");
+  }
+}

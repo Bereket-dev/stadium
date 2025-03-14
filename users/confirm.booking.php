@@ -11,7 +11,6 @@ $event_name = "";
 $seat_type  = "";
 $seat_number = "";
 $seat_price = "";
-
 if (isset($_GET["id"]) && filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
     $booking_id = $_GET["id"];
 } else {
@@ -82,39 +81,42 @@ $conn->close();
         rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
         crossorigin="anonymous" />
+    <link rel="stylesheet" href="../assets/CSS/styles.css">
 </head>
 
 <body>
-    <?php include './includes/header.php'; ?>
     <div class="container">
-        <div class="">
-            FULL NAME: <span><?php echo $fullName; ?></span>
-        </div>
-        <div class="">
-            STADIUM: <span><?php echo $stadium_name; ?></span>
-        </div>
-        <div class="">
-            EVENT: <span><?php echo $event_name; ?></span>
-        </div>
-        <div class="">
-            STATUS: <span><?php echo $status; ?></span>
-        </div>
-        <div class="">
-            SEAT TYPE: <span><?php echo $seat_name; ?></span>
-        </div>
-        <div class="">
-            SEAT NUMBER: <span><?php echo $seat_number; ?></span>
-        </div>
-        <div class="">
-            PRCIE: <span><?php echo $seat_price . " ETB"; ?></span>
-        </div>
-        <div class="">
-            <?php
-            // Assuming $qrCodeURL is fetched from the database
-            echo '<img src="' . $booking_qr . '" alt="QR Code">';
-            ?>
+        <div class=" card confirm-card mx-auto mt-5 p-3" style="height: 700px; width: 450px">
+            <div class="d-flex justify-content-between border-bottom border-dark mb-3">
+                FULL NAME: <span><?php echo $fullName; ?></span>
+            </div>
+            <div class="d-flex justify-content-between border-bottom border-dark mb-3">
+                STADIUM: <span><?php echo $stadium_name; ?></span>
+            </div>
+            <div class="d-flex justify-content-between border-bottom border-dark mb-3">
+                EVENT: <span><?php echo $event_name; ?></span>
+            </div>
+            <div class="d-flex justify-content-between border-bottom border-dark mb-3">
+                STATUS: <span><?php echo $status; ?></span>
+            </div>
+            <div class="d-flex justify-content-between border-bottom border-dark mb-3">
+                SEAT TYPE: <span><?php echo $seat_name; ?></span>
+            </div>
+            <div class="d-flex justify-content-between border-bottom border-dark mb-3">
+                SEAT NUMBER: <span><?php echo $seat_number; ?></span>
+            </div>
+            <div class="d-flex justify-content-between border-bottom border-dark mb-5">
+                PRCIE: <span><?php echo $seat_price . " ETB"; ?></span>
+            </div>
+            <div class="text-center">
+                <?php
+                // Assuming $qrCodeURL is fetched from the database
+                echo '<img src="' . $booking_qr . '" alt="QR Code">';
+                ?>
 
+            </div>
         </div>
+        <div class="text-start mx-5"><a href="./users.event.calendar.php" class="btn btn-primary"><- back</a></div>
     </div>
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"

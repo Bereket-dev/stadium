@@ -16,8 +16,8 @@ $event_date = "";
 $seat_type = "";
 $seat_amount = "";
 $seat_price = "";
-
-
+$message = "";
+$message2 = "";
 //check form date are setted or not
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["stadium_name"])) {
@@ -59,14 +59,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $seat_price = (int)$_POST["seat_price"];
     }
 
-    if (!isset($_POST["agree_terms"])) {
-        echo "You must agree to terms!";
-        exit();
-    }
 
     if (empty($stadium_name) || empty($stadium_address) || empty($event_name) || empty($event_date) || empty($seat_type) || empty($seat_amount) || empty($seat_price)) {
-        echo "Data field needed!";
-        exit();
+        $message = "Data field needed!";
+        goto form;
     }
 
     $stmt = $conn->prepare("SELECT * FROM events WHERE stadium_id = (SELECT stadium_id FROM stadiums WHERE stadium_name = ?) AND event_name = ?");
@@ -77,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        echo "This event has occured first! <br>Please enter the new event!<br> Thanks!";
+        $message = "This event has occured first! Please enter the new event! Thanks!";
         goto form;
     }
 
@@ -88,13 +84,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $folder = '../assets/Images/uploaded/' . $image_name;
 
         if (move_uploaded_file($tmp_name, $folder)) {
-            echo 'file uploaded successfully!';
+            $message2 = 'file uploaded successfully!';
         } else {
-            echo 'file not uploaded!';
+            $message = 'file not uploaded!';
             goto form;
         }
     } else {
-        echo 'no file input';
+        $message = 'no file input';
         goto form;
     }
 
@@ -170,10 +166,12 @@ form:
 
 <body>
     <!-- side bar -->
-    <?php include './includes/sidebar.html'; ?>
+    <?php
+    include './includes/sidebar.php';  ?>
 
     <div class="content">
         <div class=" text-center">
+            <p><?php echo $message; ?></p>
             <h1>Stadium Registration</h1>
         </div>
         <div class="container  p-3" style="max-width: 80vw;">
@@ -227,21 +225,15 @@ form:
                 <div class="col-md-6">
                     <div class="form-floating">
                         <textarea class="form-control mt-3" name="event_description" placeholder="Leave a description here" id="floatingTextarea"></textarea>
-                        <label for="floatingTextarea">Comments</label>
+                        <label for="floatingTextarea">Event description</label>
                     </div>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="formFile" class="form-label">Event image</label>
                     <input class="form-control" name="image" type="file" id="formFile" required>
+                    <p><?php echo $message2; ?></p>
                 </div>
-                <div class="col-12">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="gridCheck" name="agree_terms" required>
-                        <label class="form-check-label" for="gridCheck">
-                            Terms and Policy
-                        </label>
-                    </div>
-                </div>
+
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>

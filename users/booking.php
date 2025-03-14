@@ -53,15 +53,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $first_name = trim($_POST["first_name"] ?? "");
     $last_name = trim($_POST["last_name"] ?? "");
     $email_address = trim($_POST["email_address"] ?? "");
+    $transactionRef = trim($_POST["transactionRef"] ?? "");
     $quantity = $_POST["quantity"] ?? null;
     if (!$quantity) {
         $message = "no quantity post";
     }
     $price = $_POST["price"] ?? null;
     if (!$price) {
-        echo 'no price post';
+        $message = 'no price post';
+        goto form;
     }
-    if (empty($first_name) || empty($last_name) || empty($email_address)) {
+    if (empty($first_name) || empty($last_name) || empty($email_address) || empty($transactionRef)) {
         $message = "All fields are required";
         goto form;
     }
@@ -139,8 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert booking record
-    $stmt = $conn->prepare("INSERT INTO bookings (first_name, last_name, email_address, user_id, event_id, seat_number, seat_id_data, seat_type, quantity, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssiisssii", $first_name, $last_name, $email_address, $user_id, $event_id, $seat_numbers, $serilizedData, $seat_name, $quantity, $seat_price);
+    $stmt = $conn->prepare("INSERT INTO bookings (first_name, last_name, email_address, user_id, event_id, seat_number, seat_id_data, seat_type, quantity, price, transactionRef) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssiisssiis", $first_name, $last_name, $email_address, $user_id, $event_id, $seat_numbers, $serilizedData, $seat_name, $quantity, $seat_price, $transactionRef);
     $stmt->execute();
     $booking_id = $stmt->insert_id;
     $stmt->close();
@@ -191,7 +193,6 @@ form:
 </head>
 
 <body>
-    <!-- Include header with database connection -->
     <?php include './includes/header.php'; ?>
     <div class="event-banner" style="background-image: url('../assets/Images/uploaded/<?php echo $event_image ?>');">
         <div class="container">
@@ -201,7 +202,7 @@ form:
             <a href="./users/users.event.calendar.php" class="btn btn-primary">Book An Event</a>
         </div>
     </div>
-    <?php echo '<h1 class ="text-center">' . $message . '</h1>'; ?>
+    <?php echo '<p class ="text-center">' . $message . '</p>'; ?>
     <!--ticket selecting area-->
     <div class="container frames col-6">
         <div class="row border border-primary p-3">
@@ -252,24 +253,17 @@ form:
 
             <div class="mb-3">
                 <label for="exampleFormControlInput1" class="form-label">Email address</label>
-                <input type="email" class="form-control" name="email_address" id="exampleFormControlInput1" placeholder="name@example.com">
+                <input type="email" class="form-control" name="email_address" id="exampleFormControlInput1" placeholder="name@example.com" required>
             </div>
-
+            <div class="mb-3">
+                <label for="exampleFormControlInput2" class="form-label">Transaction Ref:</label>
+                <input type="text" class="form-control" name="transactionRef" id="exampleFormControlInput2" placeholder="" required>
+            </div>
             <input type="hidden" name="price" id="priceInput">
             <input type="hidden" name="quantity" id="quantityInput">
 
-            <div class="col-12">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
-                    <label class="form-check-label" for="invalidCheck">
-                        Agree to terms and conditions
-                    </label>
-                    <div class="invalid-feedback">
-                        You must agree before submitting.
-                    </div>
-                </div>
-            </div>
-            <input type="hidden" name="id" value="<?php echo $booking_id; ?>">
+
+            <input type="hidden" name="id" value="<?php echo $booking_id; ?>" required>
             <div class="col-12">
                 <button type="submit" class="mt-2 btn btn-primary">Book</button>
             </div>

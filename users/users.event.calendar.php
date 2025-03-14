@@ -26,22 +26,21 @@ include './includes/auth.user.php';
             <div class="calling-text" style="color: white;width: 50%;">
                 <h1>YOUR&nbsp;ENTERTAINMENT IS OUR GOAL</h1>
             </div>
-            <a href="./users/users.event.calendar.php" class="btn btn-primary">Book An Event</a>
         </div>
     </div>
     <?php
     $event_result = $conn->query("SELECT * FROM events");
 
-    echo '<div class="container d-flex justify-content-center frames">';
-
-    while ($event_row = $event_result->fetch_assoc()) {  // Use while loop instead of foreach
+    echo '<div class="container frames">';
+    echo '<div class = " row justify-content-center ">';
+    while ($event_row = $event_result->fetch_assoc()) { 
 
         $stmt = $conn->prepare("SELECT * FROM seattype WHERE event_id = ?");
         $stmt->bind_param("i", $event_row["id"]);
         $stmt->execute();
         $seat_result = $stmt->get_result();
 
-        while ($seat_row = $seat_result->fetch_assoc()) {  // Fetch each seat row properly
+        while ($seat_row = $seat_result->fetch_assoc()) {  
             $stmt = $conn->prepare("SELECT * FROM stadiums WHERE id = ?");
             $stmt->bind_param("i", $event_row["stadium_id"]);
             $stmt->execute();
@@ -68,14 +67,15 @@ include './includes/auth.user.php';
         }
     }
 
-    echo '</div></div>';
+    echo '</div></div></div>';
 
     include '../includes/footer.php';
     ?>
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>    <script src="./assets/js/main.js"></script>
+        crossorigin="anonymous"></script>
+    <script src="../assets/js/main.js"></script>
 
 </body>
 

@@ -37,7 +37,7 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#" style="color: white;">FOOD & DRINK</a>
+            <a class="nav-link" href="../users/order_food_drinks.php" style="color: white;">FOOD & DRINK</a>
           </li>
           <li class="nav-item dropdown">
             <a
@@ -55,7 +55,7 @@
             </ul>
           </li>
         </ul>
-        <div class="d-flex align-items-center gap-3">
+        <div class="align-items-center gap-3 btn">
           <a href="../auth/login.php" class="btn btn-success" style="font-size: 20px; border-radius: 7px;">SignIn</a>
         </div>
       </div>

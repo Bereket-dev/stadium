@@ -56,13 +56,14 @@ include './database/db.php'; //include database connection
             <h1>EVENT INFORMATION</h1>
         </div>
 
-        <div class="enfo-container d-flex border border-primary" style="text-align: end;">
-            <img src="./assets/Images/banner/info_image.png" alt="priemer league" class="image-fluid" style="max-width: 50vw;">
-            <div class="container">
-                <div class="info-text">
+        <div class="info-container row border border-primary" style="text-align: end;">
+            <div class="col"> <img src="./assets/Images/banner/info_image.png" alt="priemer league" class="image-fluid">
+            </div>
+            <div class=" col text-col">
+                <div class="info-text fs-1">
                     <h1>ETHIOPIA'S&nbsp;HIGEST PROFESSIONAL <br> LEAGUE</h1>
                 </div>
-                <div style="margin-right: 5vw;"> <a href="./users/users.event.calendar.php" class="btn btn-primary">Book An Event</a>
+                <div class="info-btn"> <a href="./users/users.event.calendar.php" class="btn btn-primary">Book An Event</a>
                 </div>
             </div>
         </div>
@@ -75,8 +76,8 @@ include './database/db.php'; //include database connection
 
         <!-- cards -->
         <div class="container" style="width: max-content;">
-            <?php include './users/upcoming.events.php' ?>
-            <div class="text-end"><a href="../users/users.event.calendar.php">See All</a></div>
+            <?php include './users/product-display.php' ?>
+            <div class="text-end"><a href="../users/order_food_drinks.php">See All</a></div>
         </div>
     </div>
 

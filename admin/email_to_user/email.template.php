@@ -1,5 +1,5 @@
 <?php
-function getEmailTemplate($fullName, $stadium_name, $event_name, $event_date, $seat_type, $seat_number, $booking_qr): string
+function getEmailTemplate($fullName, $stadium_name, $event_name, $event_date, $seat_type, $seat_number, $booking_qr, $booking_id): string
 {
     return "
     <html>
@@ -32,7 +32,7 @@ function getEmailTemplate($fullName, $stadium_name, $event_name, $event_date, $s
             
             <p>If you have any questions, please contact our support team.</p>
             
-            <a href='#' class='btn'>View Booking</a>
+            <a href='" . $_SERVER['HOST'] . "/users/confirm.booking.php?id=$booking_id' class='btn text-white text-decoration-none'>View Booking</a>
             
             <p class='footer'>&copy; " . date('Y') . " Your Company. All Rights Reserved.</p>
         </div>

@@ -14,7 +14,7 @@ usort($eventArray, function ($a, $b) {
 //card of the first event
 $maxEvents = min(3, count($eventArray));
 
-echo '<div class="d-flex justify-content-center gap-2">';
+echo '<div class="row justify-content-center gap-2">';
 for ($i = 0; $i < $maxEvents; $i++) {
     $event = $eventArray[$i];
 

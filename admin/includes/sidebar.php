@@ -36,7 +36,7 @@
     <a
       href="./event-management.php"
       class="border-bottom text-decoration-none text-white">Event Management</a>
-    <a href="#" class="border-bottom text-decoration-none text-white">Food & Drinks</a>
+    <a href="./product-management.php" class="border-bottom text-decoration-none text-white">Food & Drinks</a>
     <a href="./stadium.register.php" class="text-decoration-none text-white">Stadium Registration</a>
   </div>
 </div>

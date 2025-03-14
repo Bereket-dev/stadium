@@ -141,7 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
     <!-- side bar -->
-    <?php include './includes/sidebar.html'; ?>
+    <?php
+    include './includes/sidebar.php';  ?>
 
     <div class="content">
         <div class="text-center ">

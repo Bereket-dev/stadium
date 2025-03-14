@@ -32,7 +32,7 @@ include './includes/auth.admin.php';
             <?php
             $event_result = $conn->query("SELECT * FROM events");
 
-            echo '<div class="row">';
+            echo '<div class="row justify-content-center">';
 
             foreach ($event_result as $event_row) {
 

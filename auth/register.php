@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["username"] = $username;
             $stmt->close();
             $conn->close();
-            header("Location: ./users/dashboard.php");
+            header("Location: ../index.php");
             exit();
         }
     }
