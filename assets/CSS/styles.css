@@ -1,0 +1,197 @@
+.home-bg {
+    background-image: url(../Images/banner/front-page-image.png);
+    max-width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.frames {
+    margin-top: 100px;
+}
+
+/* card style */
+.card {
+    height: 450px;
+    width: 300px;
+    border: none;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    box-shadow: 15px 15px 100px 10px rgb(236, 230, 230);
+}
+
+.card-img-top {
+    height: 190px;
+}
+
+.card-img-icon {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: inline;
+}
+
+.stadium-card-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    margin-top: 50px;
+    margin-bottom: 5px;
+}
+
+.horizontal-line {
+    width: 100%;
+    height: 1px;
+    background-color: black;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.call-to-action {
+    background-image: url(../Images/banner/action-banner.png);
+    max-width: 100vw;
+    height: 442px;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+
+.calling-text h1 {
+    font-size: 48px;
+    padding: 80px 0 10px;
+}
+
+.info-text h1 {
+    margin: 80px 5vw 15px !important;
+}
+
+.footer {
+    color: white;
+    padding: 50px 0;
+    line-height: 1.5 !important;
+}
+
+.footer a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer h3 {
+    color: rgba(255, 254, 252, 0.785);
+    font-size: 24px;
+}
+
+
+.login-form {
+    box-shadow: 15px 15px 100px 10px rgb(236, 230, 230);
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.event-banner {
+    height: 442px;
+    max-width: 100vw;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    padding-top: 20px;
+}
+
+.event-banner-calendar {
+    background-image: url(../Images/banner/action-banner.png);
+}
+
+.navbar-collapse {
+    text-align: end !important;
+    margin-left: auto;
+}
+
+nav {
+    background-color: rgba(143, 135, 135, 0.23);
+    z-index: 2;
+    transition: background-color 0.3s ease-in-out;
+}
+
+header nav.scrolled {
+    background-color: #b1b3b67f !important;
+}
+
+header nav.scrolled .navbar-toggler {
+    color: white;
+}
+
+.side_bar {
+    height: 100vh;
+    width: 300px;
+}
+
+.admin_image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.content {
+    margin-left: 300px;
+    padding: 50px 50px 0;
+}
+
+.box-shadow {
+    box-shadow: 5px 5px 10px rgba(184, 180, 180, 0.4);
+    /* box-shadow: -5px -5px 10px white; */
+}
+
+.confirm-card {
+    background-color: rgb(222, 217, 217);
+}
+
+.info-container img {
+    max-width: 50vw;
+}
+
+.info-btn {
+    padding-right: 5vw !important;
+}
+
+.product-form {
+    width: max-content;
+    height: max-content;
+}
+
+
+@media screen and (max-width: 1100px) {
+    .info-text h1 {
+        margin: 50px 3vw 10px !important;
+    }
+
+    .info-btn {
+        padding-right: 30px !important;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .info-container {
+        flex-direction: column;
+    }
+
+    .info-container img {
+        max-width: 100vw;
+
+    }
+
+    .row>* {
+        padding-left: 0;
+    }
+
+    .info-btn {
+        padding-right: 0 !important;
+    }
+
+    .info-container .text-col {
+        text-align: center;
+        padding-bottom: 30px !important;
+    }
+}
