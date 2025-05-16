@@ -1,10 +1,10 @@
 <?php
-if (!isset($_SESSION['username']) || !isset($_SESSION["roles"])) {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION["roles"])) {
     header("Location: ../auth/login.php");
     exit();
 }
 
 if ($_SESSION["roles"] !== "admin") {
-    echo 'anauthorized acces!';
+    header("Location: ../auth/login.php");
     exit();
 }

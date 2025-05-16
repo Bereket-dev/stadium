@@ -9,8 +9,11 @@ $password = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    if (isset($_POST["username"])) {
-        $username = trim($_POST["username"]);
+    if (isset($_POST["first_name"])) {
+        $first_name = trim($_POST["first_name"]);
+    }
+    if (isset($_POST["last_name"])) {
+        $last_name = trim($_POST["last_name"]);
     }
     if (isset($_POST["email"])) {
         $email = trim($_POST["email"]);
@@ -19,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = trim($_POST["password"]);
     }
 
-    if (empty($username) || empty($email) || empty($password)) {
+    if (empty($first_name) || empty($last_name) ||  empty($email) || empty($password)) {
         echo "Data field needed!";
         goto jump_here;
     }
@@ -27,14 +30,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? OR username = ?");
-    $stmt->bind_param("ss", $email, $username);
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
     $stmt->execute();
 
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        echo "Use unique email and username!";
+        echo "This email has registered first!";
         $stmt->close();
     } else {
         $stmt->close();
@@ -48,13 +51,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $password = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $conn->prepare("INSERT INTO users(username, email, password_hash) VALUES(?, ?, ?)");
-        $stmt->bind_param("sss", $username, $email, $password);
+        $stmt = $conn->prepare("INSERT INTO users(first_name, last_name, email, password_hash) VALUES(?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $first_name, $last_name, $email, $password);
         $result = $stmt->execute();
-
+        $user_id = $stmt->insert_id;
         if ($result) {
             session_start();
-            $_SESSION["username"] = $username;
+            $_SESSION["user_id"] = $user_id;
             $stmt->close();
             $conn->close();
             header("Location: ../index.php");
@@ -86,8 +89,13 @@ jump_here:
     <form method="post" class="mx-auto my-5 login-form" style="width: 500px;">
         <!--- username -->
         <div class="mb-3">
-            <label for="usernameInput" class="form-label">Username</label>
-            <input type="text" class="form-control" id="usernameInput" name="username" aria-describedby="" required>
+            <label for="usernameInput" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="usernameInput" name="first_name" aria-describedby="" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="usernameInput" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="usernameInput" name="last_name" aria-describedby="" required>
         </div>
 
         <div class="mb-3">

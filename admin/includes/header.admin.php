@@ -1,8 +1,8 @@
 <?php
-
+$totalUsers = 0;
 $sql = "SELECT * FROM users ";
-$result = $conn->query($sql)->fetch_assoc();
-$totalUsers = count($result);
+$result = $conn->query(query: $sql)->fetch_assoc();
+$totalUsers = count(value: $result);
 
 $sql = "SELECT * FROM bookings ";
 $result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);

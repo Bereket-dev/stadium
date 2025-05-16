@@ -8,9 +8,6 @@ $password = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    if (isset($_POST["username"])) {
-        $username = trim($_POST["username"]);
-    }
     if (isset($_POST["email"])) {
         $email = trim($_POST["email"]);
     }
@@ -18,23 +15,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = trim($_POST["password"]);
     }
 
-    if (empty($username) || empty($password)) {
+    if (empty($email) || empty($password)) {
         $message = "Data field needed!";
         goto jump_here;
     }
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? ");
-    $stmt->bind_param("s", $username);
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? ");
+    $stmt->bind_param("s", $email);
     $stmt->execute();
 
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
     $stmt->close();
 
-    if (password_verify($password, $row["password_hash"])) {
+    if ($row && password_verify($password, $row["password_hash"])) {
 
         session_start();
-        $_SESSION["username"] = $row["username"];
+        $_SESSION["user_id"] = $row["id"];
         $_SESSION["roles"] = $row["roles"];
 
         if ($row["roles"] == "admin") {
@@ -75,8 +72,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php echo '<p class="text-center">' . $message . '</p>' ?>
         <!--- username -->
         <div class="mb-3">
-            <label for="usernameInput" class="form-label">Username</label>
-            <input type="text" class="form-control" id="usernameInput" name="username" aria-describedby="" required>
+            <label for="usernameInput" class="form-label">Email</label>
+            <input type="text" class="form-control" id="usernameInput" name="email" aria-describedby="" required>
         </div>
 
         <div class="mb-3">
