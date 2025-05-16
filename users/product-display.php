@@ -1,15 +1,10 @@
 <?php include './database/db.php';
-$stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
-$stmt->bind_param("i", $_SESSION["username"]);
-$stmt->execute();
-$user = $stmt->get_result()->fetch_assoc();
-$user_id = $user['id'];
-$stmt->close(); ?>
+        $user_id = isset($_SESSION["user_id"]) ? $_SESSION["user_id"] : null; ?>
 
 <div class="row  justify-content-center frames">
 
     <?php
-    $sql = 'SELECT * FROM products LIMIT 3';
+    $sql = 'SELECT * FROM product LIMIT 3';
     $result = $conn->query($sql);
     while ($product = $result->fetch_assoc()) {
         echo '<div id = " class="col-auto m-2" style="width: max-content">';

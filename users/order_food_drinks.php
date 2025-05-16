@@ -9,8 +9,8 @@ $message1 = "";
 $message2 = "";
 
 
-$stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
-$stmt->bind_param("i", $_SESSION["username"]);
+$stmt = $conn->prepare("SELECT id FROM user WHERE id = ?");
+$stmt->bind_param("i", $_SESSION["user_id"]);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
 $user_id = $user['id'];
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         goto form;
     }
     // Fetch product price
-    $stmt = $conn->prepare("SELECT product_price FROM products WHERE id = ?");
+    $stmt = $conn->prepare("SELECT product_price FROM product WHERE id = ?");
     $stmt->bind_param("i", $product_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
 
-    $stmt = $conn->prepare("SELECT * FROM orders WHERE user_id = ? AND product_id = ?");
+    $stmt = $conn->prepare("SELECT * FROM order WHERE user_id = ? AND product_id = ?");
     $stmt->bind_param("ii", $user_id, $product_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result->num_rows == 0) {
 
         // Insert order
-        $stmt = $conn->prepare("INSERT INTO orders (user_id, product_id, quantity, total_price, seat_number) 
+        $stmt = $conn->prepare("INSERT INTO order (user_id, product_id, quantity, total_price, seat_number) 
             VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("iiiii", $user_id, $product_id, $quantity, $total_price, $seat_number);
 

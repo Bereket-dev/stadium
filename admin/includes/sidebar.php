@@ -12,7 +12,7 @@
         data-bs-toggle="dropdown"
         aria-expanded="false">
         <?php
-        $stmt = $conn->prepare("SELECT * FROM users WHERE id = ? ");
+        $stmt = $conn->prepare("SELECT * FROM user WHERE id = ? ");
         $stmt->bind_param("i", $_SESSION['user_id']);
         $stmt->execute();
 

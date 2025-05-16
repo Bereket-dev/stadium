@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
 
-    $stmt = $conn->prepare("SELECT * FROM products WHERE product_name = ?");
+    $stmt = $conn->prepare("SELECT * FROM product WHERE product_name = ?");
     $stmt->bind_param("s", $product_name);
     $stmt->execute();
 
@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
         $result->close();
 
-        $stmt = $conn->prepare("INSERT INTO products(product_name, product_price, product_amount, product_image) VALUES(?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO product(product_name, product_price, product_amount, product_image) VALUES(?, ?, ?, ?)");
         $stmt->bind_param("siis", $product_name, $product_price, $product_amount, $image_name);
 
         if ($stmt->execute()) {
@@ -114,10 +114,10 @@ form:
                 <div class="col-1"></div>
             </div>
             <?php
-            $sql = "SELECT * FROM orders";
+            $sql = "SELECT * FROM `order`";
             $orderresult = $conn->query($sql);
             while ($order = $orderresult->fetch_assoc()) {
-                $stmt2 = $conn->prepare("SELECT username FROM users WHERE id = ?");
+                $stmt2 = $conn->prepare("SELECT first_name FROM user WHERE id = ?");
                 $stmt2->bind_param("i", $order["user_id"]);
                 $stmt2->execute();
                 $stmt2->bind_result($username);
@@ -154,7 +154,7 @@ form:
                 </div>
 
                 <?php
-                $sql = 'SELECT * FROM products';
+                $sql = 'SELECT * FROM product';
                 $result = $conn->query($sql);
 
                 while ($product = $result->fetch_assoc()) {

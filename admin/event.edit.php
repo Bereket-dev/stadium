@@ -9,19 +9,12 @@ $event_id  = "";
 if (isset($_GET["id"]) && filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
     $event_id = $_GET['id'];
 } else {
-    header("Location: admin.event.calendar.php");
+    header("Location: event-management.php");
     exit();
 }
 
-if (isset($_GET["seattype_id"])) {
-    $seattype_id = $_GET['id'];
-} else {
-    header("Location: admin.event.calendar.php");
-    exit();
-}
-
-$stmt = $conn->prepare("SELECT * FROM events WHERE id = ?");
-$stmt->bind_param("s", $event_id);
+$stmt = $conn->prepare("SELECT * FROM `event` WHERE id = ?");
+$stmt->bind_param("i", $event_id);
 $stmt->execute();
 
 $result = $stmt->get_result();
@@ -160,23 +153,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="datetime-local" class="form-control" name="event_date" id="inputAddress2" placeholder="Apartment, studio, or floor" required>
                 </div>
 
-                <div class="col-md-2">
-                    <label for="inputState" class="form-label">Seat Type</label>
-                    <select name="seat_type" id="inputState" class="form-select" required>
-                        <option selected>Choose...</option>
-                        <option value="vip">VIP</option>
-                        <option value="viip">VIIP</option>
-                        <option value="normal">NORMAL</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="inputZip" class="form-label">Amount</label>
-                    <input type="number" name="seat_amount" placeholder="total seat" min="0" class="form-control" id="" required>
-                </div>
-                <div class="col-md-2">
-                    <label for="inputZip" class="form-label">PRICE</label>
-                    <input type="number" name="seat_price" placeholder="each price" min="0" class="form-control" id="" required>
-                </div>
                 <div class="col-md-6">
                     <div class="form-floating">
                         <textarea class="form-control mt-3" name="event_description" placeholder="Leave a description here" id="floatingTextarea"></textarea>
@@ -187,7 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="formFile" class="form-label">Event image</label>
                     <input class="form-control" name="image" type="file" id="formFile">
                 </div>
-
+                <div class="seatContainer"></div>
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
@@ -198,6 +174,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+    <script src="../assets/js/main.js">
+    </script>
+    <script>
+        window.onload = () => addSeatRow();
+    </script>
 </body>
 
 </html>

@@ -58,3 +58,40 @@ function showHiddenForm(productId) {
     buyButton.classList.remove("btn-secondary");
   }
 }
+
+function createSeatRow() {
+  const row = document.createElement("div");
+  row.classList.add("row", "mt-2");
+
+  row.innerHTML = `                <div class="row">
+                    <div class="col-md-3">
+                        <label for="inputZip" class="form-label">Seat Type</label>
+                        <input type="text" name="seat_type[]" placeholder="VIP" class="form-control" id="" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="inputZip" class="form-label">Amount</label>
+                        <input type="number" name="seat_amount[]" placeholder="total seat" min="0" class="form-control" id="" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="inputZip" class="form-label">PRICE</label>
+                        <input type="number" name="seat_price[]" placeholder="each price" min="0" class="form-control" id="" required>
+                    </div>
+                    <div class="addSeat col-md-1 btn-secondary btn align-self-end text-white " onclick = "addSeatRow()">+</div>
+                    <div class="removeSeat col-md-1 btn btn-danger ms-1 btn align-self-end text-white " onclick = "removeSeatRow(this)">-</div>
+
+                </div>`;
+
+  return row;
+}
+
+function addSeatRow() {
+  const container = document.querySelector(".seatContainer");
+  const newRow = createSeatRow();
+
+  container.appendChild(newRow);
+}
+
+function removeSeatRow(button) {
+  const row = button.closest(".row");
+  row.remove();
+}

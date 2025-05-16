@@ -1,3 +1,5 @@
+<?php
+$is_loged_in = isset($_SESSION["user_id"]) ?  true : false ?>
 <header>
   <nav class="navbar navbar-expand-lg navbar-dark position-fixed" style="top: 0; width: 100%;">
     <div class="container">
@@ -56,7 +58,11 @@
           </li>
         </ul>
         <div class="align-items-center gap-3 btn">
-          <a href="../auth/login.php" class="btn btn-success" style="font-size: 20px; border-radius: 7px;">SignIn</a>
+          <?php if ($is_loged_in) {
+            echo '<a href="../auth/logout.php" class="btn btn-outline-success bg-white" style="font-size: 20px; border-radius: 7px;">Logout</a>';
+          } else {
+            echo '<a href="../auth/login.php" class="btn btn-success" style="font-size: 20px; border-radius: 7px;">SignIn</a>';
+          } ?>
         </div>
       </div>
   </nav>

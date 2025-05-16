@@ -44,7 +44,7 @@ include './includes/auth.admin.php';
                 <div class="col-1"></div>
             </div>
             <?php
-            $sql = "SELECT * FROM bookings";
+            $sql = "SELECT * FROM booking";
             $result = $conn->query($sql);
             while ($row = $result->fetch_assoc()) {
                 echo '<div class="row   border-top mt-2">';

@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         goto jump_here;
     }
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? ");
+    $stmt = $conn->prepare("SELECT * FROM user WHERE email = ? ");
     $stmt->bind_param("s", $email);
     $stmt->execute();
 
@@ -32,12 +32,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         session_start();
         $_SESSION["user_id"] = $row["id"];
-        $_SESSION["roles"] = $row["roles"];
+        $_SESSION["role"] = $row["role"];
 
-        if ($row["roles"] == "admin") {
+        if ($row["role"] == "admin") {
             header("Location: ../admin/admin_dashboard.php");
             exit();
-        } else if ($row["roles"] == "user") {
+        } else if ($row["role"] == "user") {
             header("Location: ../index.php");
             exit();
         }

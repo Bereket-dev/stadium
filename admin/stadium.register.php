@@ -13,9 +13,10 @@ $event_name = "";
 $event_date = "";
 
 //initialize seat type variables
-$seat_type = "";
-$seat_amount = "";
-$seat_price = "";
+$seat_types = [];
+$seat_amounts = [];
+$seat_prices = [];
+
 $message = "";
 $message2 = "";
 //check form date are setted or not
@@ -50,22 +51,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     if (isset($_POST["seat_type"])) {
-        $seat_type = trim($_POST["seat_type"]);
+        $seat_types = $_POST["seat_type"];
     }
     if (isset($_POST["seat_amount"])) {
-        $seat_amount = (int)($_POST["seat_amount"]);
+        $seat_amounts = $_POST["seat_amount"];
     }
     if (isset($_POST["seat_price"])) {
-        $seat_price = (int)$_POST["seat_price"];
+        $seat_prices = $_POST["seat_price"];
     }
 
 
-    if (empty($stadium_name) || empty($stadium_address) || empty($event_name) || empty($event_date) || empty($seat_type) || empty($seat_amount) || empty($seat_price)) {
+    if (empty($stadium_name) || empty($stadium_address) || empty($event_name) || empty($event_date) || empty($seat_types) || empty($seat_amounts) || empty($seat_prices)) {
         $message = "Data field needed!";
         goto form;
     }
 
-    $stmt = $conn->prepare("SELECT * FROM events WHERE stadium_id = (SELECT stadium_id FROM stadiums WHERE stadium_name = ?) AND event_name = ?");
+    $stmt = $conn->prepare("SELECT * FROM `event` WHERE stadium_id = (SELECT stadium_id FROM stadium WHERE stadium_name = ?) AND event_name = ?");
     $stmt->bind_param("ss", $stadium_name, $event_name);
     $stmt->execute();
 
@@ -97,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
     $result->close();
 
-    $stmt = $conn->prepare("SELECT * FROM Stadiums WHERE stadium_name = ?");
+    $stmt = $conn->prepare("SELECT * FROM Stadium WHERE stadium_name = ?");
     $stmt->bind_param("s", $stadium_name);
     $stmt->execute();
 
@@ -109,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
         $result->close();
 
-        $stmt = $conn->prepare("INSERT INTO stadiums(stadium_name, stadium_address, city, region, postal_code) VALUES(?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO stadium(stadium_name, stadium_address, city, region, postal_code) VALUES(?, ?, ?, ?, ?)");
         $stmt->bind_param("sssss", $stadium_name, $stadium_address, $stadium_city, $stadium_region, $stadium_postal_code);
         $stmt->execute();
 
@@ -124,28 +125,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
 
-    $stmt = $conn->prepare("INSERT INTO events(event_name, event_date, stadium_id, event_description, layout_image) VALUES(?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO event(event_name, event_date, stadium_id, event_description, layout_image) VALUES(?, ?, ?, ?, ?)");
     $stmt->bind_param("ssiss", $event_name, $event_date, $stadium_id, $event_description, $image_name);
     $stmt->execute();
 
     $event_id = $stmt->insert_id;
     $stmt->close();
 
-    $stmt = $conn->prepare("INSERT INTO seattype(seat_name, stadium_id, event_id, seat_amount, seat_price) VALUES(?, ?, ?, ?, ?)");
-    $stmt->bind_param("siiii", $seat_type, $stadium_id, $event_id, $seat_amount, $seat_price);
-    $stmt->execute();
-    $seattype_id = $stmt->insert_id;
-    $stmt->close();
+    for ($i = 0; $i < count($seat_types); $i++) {
+        $stmt = $conn->prepare("INSERT INTO seattype(seat_name, event_id, seat_amount, seat_price) VALUES(?, ?, ?, ?)");
+        $stmt->bind_param("siii", $seat_types[$i], $event_id, $seat_amounts[$i], $seat_prices[$i]);
+        $stmt->execute();
+        $seattype_id = $stmt->insert_id;
+        $stmt->close();
 
-    $seat_number = 0;
-    for ($num = 0; $num < $seat_amount; $num++) {
-        $seat_number++;
-        $stmt = $conn->prepare("INSERT INTO seats(stadium_id, seattype_id, event_id, seat_number) VALUES(?, ?, ?, ?)");
-        $stmt->bind_param("isii", $stadium_id, $seattype_id, $event_id, $seat_number);
+        $seat_status = "available";
+        $seat_number = $seat_amounts[$i];
+        $stmt = $conn->prepare("INSERT INTO seat(seattype_id, seat_status, `number`) VALUES(?, ?, ?)");
+        $stmt->bind_param("isi", $seattype_id, $seat_status, $seat_number);
+        $stmt->execute();
+        $stmt->close();
+
+        $seat_status = "booked";
+        $seat_number = 0;
+        $stmt = $conn->prepare("INSERT INTO seat(seattype_id, seat_status, `number`) VALUES(?, ?, ?)");
+        $stmt->bind_param("isi", $seattype_id, $seat_status, $seat_number);
+        $stmt->execute();
+        $stmt->close();
+
+        $seat_status = "selected";
+        $seat_number = 0;
+        $stmt = $conn->prepare("INSERT INTO seat(seattype_id, seat_status, `number`) VALUES(?, ?, ?)");
+        $stmt->bind_param("isi", $seattype_id, $seat_status, $seat_number);
         $stmt->execute();
         $stmt->close();
     }
-    $conn->close();
 }
 form:
 ?>
@@ -154,7 +168,7 @@ form:
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin| stadium registration</title>
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
@@ -204,35 +218,21 @@ form:
                     <label for="inputAddress2" class="form-label">Event Date</label>
                     <input type="datetime-local" class="form-control" name="event_date" id="inputAddress2" placeholder="Apartment, studio, or floor" required>
                 </div>
-
-                <div class="col-md-2">
-                    <label for="inputState" class="form-label">Seat Type</label>
-                    <select name="seat_type" id="inputState" class="form-select" required>
-                        <option selected>Choose...</option>
-                        <option value="vip">VIP</option>
-                        <option value="viip">VIIP</option>
-                        <option value="normal">NORMAL</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="inputZip" class="form-label">Amount</label>
-                    <input type="number" name="seat_amount" placeholder="total seat" min="0" class="form-control" id="" required>
-                </div>
-                <div class="col-md-2">
-                    <label for="inputZip" class="form-label">PRICE</label>
-                    <input type="number" name="seat_price" placeholder="each price" min="0" class="form-control" id="" required>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <textarea class="form-control mt-3" name="event_description" placeholder="Leave a description here" id="floatingTextarea"></textarea>
-                        <label for="floatingTextarea">Event description</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <textarea class="form-control mt-3" name="event_description" placeholder="Leave a description here" id="floatingTextarea"></textarea>
+                            <label for="floatingTextarea">Event description</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="formFile" class="form-label">Event image</label>
+                        <input class="form-control" name="image" type="file" id="formFile" required>
+                        <p><?php echo $message2; ?></p>
                     </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="formFile" class="form-label">Event image</label>
-                    <input class="form-control" name="image" type="file" id="formFile" required>
-                    <p><?php echo $message2; ?></p>
-                </div>
+
+                <div class="seatContainer"></div>
 
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -244,6 +244,11 @@ form:
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+    <script src="../assets/js/main.js">
+    </script>
+    <script>
+        window.onload = () => addSeatRow();
+    </script>
 </body>
 
 </html>

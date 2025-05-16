@@ -1,7 +1,7 @@
 <?php
 include './database/db.php';
 
-$result = $conn->query("SELECT * FROM events");
+$result = $conn->query("SELECT * FROM event");
 $eventArray = [];
 while ($event_date  = $result->fetch_assoc()) {
     $eventArray[] = $event_date;
@@ -19,13 +19,13 @@ for ($i = 0; $i < $maxEvents; $i++) {
     $event = $eventArray[$i];
 
 
-    $stmt = $conn->prepare("SELECT * FROM stadiums WHERE id = ?");
+    $stmt = $conn->prepare("SELECT * FROM stadium WHERE id = ?");
     $stmt->bind_param("i", $event["stadium_id"]);
     $stmt->execute();
     $stadium = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
-    $stmt = $conn->prepare("SELECT * FROM seats WHERE event_id = ?");
+    $stmt = $conn->prepare("SELECT * FROM seat WHERE event_id = ?");
     $stmt->bind_param("i", $event["id"]);
     $stmt->execute();
     $seat = $stmt->get_result()->fetch_assoc();

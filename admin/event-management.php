@@ -30,21 +30,12 @@ include './includes/auth.admin.php';
     <div class="content">
         <div class="d-flex justify-content-center">
             <?php
-            $event_result = $conn->query("SELECT * FROM events");
+            $event_result = $conn->query("SELECT * FROM `event`");
 
             echo '<div class="row justify-content-center">';
 
             foreach ($event_result as $event_row) {
-
-                $stmt = $conn->prepare("SELECT * FROM seattype WHERE event_id = ?");
-                $stmt->bind_param("i", $event_row["id"]);
-                $stmt->execute();
-
-                $seat_result = $stmt->get_result();
-
-
-                foreach ($seat_result as $seat_row) {
-                    $stmt = $conn->prepare("SELECT * FROM stadiums WHERE id = ?");
+                    $stmt = $conn->prepare("SELECT * FROM stadium WHERE id = ?");
                     $stmt->bind_param("i", $event_row["stadium_id"]);
                     $stmt->execute();
                     $stadium = $stmt->get_result()->fetch_assoc();
@@ -64,11 +55,11 @@ include './includes/auth.admin.php';
                     echo ' ( ' . $event_row["event_date"] . ' )' . '</p>';
                     echo '<div class="horizontal-line"></div>';
                     echo '<div class="d-flex justify-content-between align-items-end">';
-                    echo '<a href="../admin/event.edit.php?id=' . $event_row["id"] . '&seattype_id=' . $seat_row["id"] . '" class="btn btn-secondary me-2" style="font-size: 14px;">EDIT EVENT</a>';
+                    echo '<a href="../admin/event.edit.php?id=' . $event_row["id"] . '" class="btn btn-secondary me-2" style="font-size: 14px;">EDIT EVENT</a>';
                     echo '<a href="../admin/event.delete.php?id=' . $event_row["id"] . '" class="btn btn-danger" style="font-size: 14px;">REMOVE EVENT</a>';
                     echo '</div></div></div></div>';
                 }
-            }
+            
 
             echo '</div></div></div>';
             ?>

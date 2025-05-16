@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT * FROM user WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
 
@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $password = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $conn->prepare("INSERT INTO users(first_name, last_name, email, password_hash) VALUES(?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO user(first_name, last_name, email, password_hash) VALUES(?, ?, ?, ?)");
         $stmt->bind_param("ssss", $first_name, $last_name, $email, $password);
         $result = $stmt->execute();
         $user_id = $stmt->insert_id;

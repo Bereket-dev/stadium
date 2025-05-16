@@ -1,10 +1,10 @@
 <?php
 $totalUsers = 0;
-$sql = "SELECT * FROM users ";
-$result = $conn->query(query: $sql)->fetch_assoc();
-$totalUsers = count(value: $result);
+$sql = "SELECT * FROM user ";
+$result = $conn->query(query: $sql);
+$totalUsers = $result->num_rows;
 
-$sql = "SELECT * FROM bookings ";
+$sql = "SELECT * FROM booking ";
 $result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
 $confirmedRevenue = 0;
@@ -13,20 +13,27 @@ foreach ($result as $row) {
 }
 
 
-$sql = "SELECT * FROM bookings WHERE `status` = 'confirmed'";
+$sql = "SELECT * FROM booking WHERE `status` = 'confirmed'";
 $result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 $totalBookings = 0;
 foreach ($result as $row) {
   $totalBookings += (int)$row["quantity"];
 }
 
-$sql = "SELECT * FROM seattype ";
-$result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
-$projectedRevenue = count($result);
-
+// Initialize projected revenue
 $projectedRevenue = 0;
-foreach ($result as $row) {
-  $projectedRevenue += (int)$row["seat_price"];
+
+// Calculate total projected revenue by summing (seat_amount * seat_price) for all seat types
+$sql = "SELECT seat_amount, seat_price FROM seattype";
+$result = $conn->query($sql);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $projectedRevenue += (int)$row['seat_amount'] * (float)$row['seat_price'];
+    }
+} else {
+    // Handle error or no results
+    $projectedRevenue = 0;
 }
 
 

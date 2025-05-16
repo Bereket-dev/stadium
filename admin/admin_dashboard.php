@@ -34,7 +34,7 @@ include './includes/auth.admin.php';
     <div class="content">
         <div class="row justify-content-center gap-3">
             <?php
-            $event_result = $conn->query("SELECT * FROM events");
+            $event_result = $conn->query("SELECT * FROM `event`");
 
             while ($event = $event_result->fetch_assoc()) {
                 echo '<div class="col-auto box-shadow" style="width: 500px;">';
