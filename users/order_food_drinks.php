@@ -30,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if (empty($product_id) || empty($quantity) || empty($seat_number)) {
         $message1 = "Data field needed";
-        goto form;
     }
     // Fetch product price
     $stmt = $conn->prepare("SELECT product_price FROM product WHERE id = ?");
@@ -64,7 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message1 = "Please the product is on " . $myorder['status']  . " !";
     }
 }
-form:
 ?>
 
 <!DOCTYPE html>

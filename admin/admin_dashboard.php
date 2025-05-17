@@ -25,7 +25,7 @@ include './includes/auth.admin.php';
 
     <!-- side bar and header-->
     <?php
-    include './includes/sidebar.php';  
+    include './includes/sidebar.php';
     include './includes/header.admin.php';
 
     ?>

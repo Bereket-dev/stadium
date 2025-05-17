@@ -7,7 +7,7 @@ if (isset($_GET["id"]) && filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
     header("Location: product-management.php");
     exit();
 }
-$stmt = $conn->prepare("SELECT * FROM orders WHERE  id = ?");
+$stmt = $conn->prepare("SELECT * FROM `order` WHERE  id = ?");
 $stmt->bind_param("i", $order_id);
 $stmt->execute();
 
@@ -16,12 +16,12 @@ $row = $result->fetch_assoc();
 
 $order_status = $row["status"];
 if ($order_status == 'pending' || $order_status == 'processing') {
-    $stmt = $conn->prepare("UPDATE orders SET `status` = 'cancelled' WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE `order` SET `status` = 'cancelled' WHERE id = ?");
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $stmt->close();
 } else if ($order_status == 'cancelled' || $order_status == 'delivered') {
-    $stmt = $conn->prepare("DELETE FROM orders  WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM `order`  WHERE id = ?");
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $stmt->close();

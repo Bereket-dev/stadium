@@ -78,7 +78,7 @@ form:
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin| Orders</title>
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
@@ -117,15 +117,15 @@ form:
             $sql = "SELECT * FROM `order`";
             $orderresult = $conn->query($sql);
             while ($order = $orderresult->fetch_assoc()) {
-                $stmt2 = $conn->prepare("SELECT first_name FROM user WHERE id = ?");
-                $stmt2->bind_param("i", $order["user_id"]);
+                $stmt2 = $conn->prepare("SELECT product_name FROM product WHERE id = ?");
+                $stmt2->bind_param("i", $order["product_id"]);
                 $stmt2->execute();
-                $stmt2->bind_result($username);
+                $stmt2->bind_result($product);
                 $stmt2->fetch();
                 $stmt2->close();
 
                 echo '<div class="row   border-top mt-2">';
-                echo  '<div class="col">' . $username . '</div>';
+                echo  '<div class="col">' . $product . '</div>';
                 echo  '<div class="col">' . $order["quantity"] . '</div>';
                 echo    '<div class="col-2">' . $order["seat_number"] . '</div>';
                 echo   '<div class="col-2">' . $order["total_price"] . '</div>';

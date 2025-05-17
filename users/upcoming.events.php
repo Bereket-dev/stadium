@@ -1,7 +1,7 @@
 <?php
 include './database/db.php';
 
-$result = $conn->query("SELECT * FROM event");
+$result = $conn->query("SELECT * FROM `event`");
 $eventArray = [];
 while ($event_date  = $result->fetch_assoc()) {
     $eventArray[] = $event_date;
@@ -25,12 +25,6 @@ for ($i = 0; $i < $maxEvents; $i++) {
     $stadium = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
-    $stmt = $conn->prepare("SELECT * FROM seat WHERE event_id = ?");
-    $stmt->bind_param("i", $event["id"]);
-    $stmt->execute();
-    $seat = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-
     echo '<div class="col-auto m-2">';
     echo '<div class="card" >';
     echo '<img src="../assets/Images/uploaded/' . $event["layout_image"] . '" style="width: 100%;" class="card-img-top image-fluid" alt="...">';
@@ -45,7 +39,7 @@ for ($i = 0; $i < $maxEvents; $i++) {
     echo ' ( ' . $event["event_date"] . ' )' . '</p>';
     echo '<div class="horizontal-line"></div>';
     echo '<div class="d-flex justify-content-between align-items-end">';
-    echo '<a href="../users/booking.php?id=' . $event["id"]  . "&seattype_id=" . $seat["seattype_id"] . '" class="btn btn-primary me-2" style="font-size: 14px;">Book Ticket</a>';
+    echo '<a href="../users/booking.php?id=' . $event["id"] . '" class="btn btn-primary me-2" style="font-size: 14px;">Book Ticket</a>';
     echo '<a href="../users/users.event.calendar.php">Learn More -></a>';
     echo '</div></div></div></div>';
 }

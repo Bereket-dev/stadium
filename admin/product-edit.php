@@ -14,7 +14,7 @@ if (isset($_GET["id"]) && filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
 }
 
 
-$stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
+$stmt = $conn->prepare("SELECT * FROM product WHERE id = ?");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
 
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
     $result->close();
 
-    $stmt = $conn->prepare("UPDATE products SET product_name = ?, product_price = ?, product_amount = ?, product_image = ? WHERE id = ? ");
+    $stmt = $conn->prepare("UPDATE product SET product_name = ?, product_price = ?, product_amount = ?, product_image = ? WHERE id = ? ");
     $stmt->bind_param("siisi", $product_name, $product_price, $product_amount, $image_name, $product_id);
     $stmt->execute();
     $stmt->close();

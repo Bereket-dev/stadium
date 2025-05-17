@@ -3,6 +3,7 @@ session_start(); //to check the user was logged in
 include '../database/db.php';
 include './includes/auth.user.php';
 $message = "";
+
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
     if (!isset($_GET["id"]) || !filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
@@ -11,30 +12,13 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     } else {
         $_SESSION["event_id"] = $_GET['id'];
     }
-
-    if (!isset($_GET["seattype_id"]) || empty($_GET["seattype_id"])) {
-        header("Location: ../users/users.event.calendar.php");
-        exit();
-    } else {
-        $_SESSION["seattype_id"] = $_GET["seattype_id"];
-    }
-
-    $stmt = $conn->prepare("SELECT * FROM seattype WHERE id = ?");
-    $stmt->bind_param("i", $_SESSION["seattype_id"]);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-
-    $_SESSION["seat_price"] = $row['seat_price'];
-    $_SESSION["seat_name"] = $row['seat_name'];
-    $stmt->close();
+    
 }
 
 $event_id = $_SESSION["event_id"] ?? null;
-// $seat_name = $_SESSION["seat_name"] ?? null;
-// $seattype_id = $_SESSION["seattype_id"] ?? null;
 
 // Fetch event details
-$stmt = $conn->prepare("SELECT * FROM events WHERE id = ?");
+$stmt = $conn->prepare("SELECT * FROM `event` WHERE id = ?");
 $stmt->bind_param("i", $event_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -82,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     // Fetch user ID
-    $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+    $stmt = $conn->prepare("SELECT id FROM `user` WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $user_id = $stmt->get_result()->fetch_assoc()["id"] ?? null;
@@ -93,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Fetch available seat
-    $stmt = $conn->prepare("SELECT * FROM seats WHERE seattype_id = ? AND seat_status = 'available' AND event_id = ? LIMIT ?");
+    $stmt = $conn->prepare("SELECT * FROM `seat` WHERE seattype_id = ? AND seat_status = 'available' AND event_id = ? LIMIT ?");
     $stmt->bind_param("iii", $seattype_id, $event_id, $quantity);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -121,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Update seat status
     foreach ($seat_idArray as $seat_id) {
-        $stmt = $conn->prepare("UPDATE seats SET seat_status = 'selected' WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE `seat` SET seat_status = 'selected' WHERE id = ?");
         $stmt->bind_param("i", $seat_id);
         $stmt->execute();
         $stmt->close();
@@ -129,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $serilizedData = json_encode($seat_idArray); //serilizing to store it in booking table
 
     // Fetch stadium name
-    $stmt = $conn->prepare("SELECT stadium_name FROM stadiums WHERE id = ?");
+    $stmt = $conn->prepare("SELECT stadium_name FROM stadium WHERE id = ?");
     $stmt->bind_param("i", $stadium_id);
     $stmt->execute();
     $stadium_name = $stmt->get_result()->fetch_assoc()["stadium_name"] ?? "Unknown";
@@ -141,7 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert booking record
-    $stmt = $conn->prepare("INSERT INTO bookings (first_name, last_name, email_address, user_id, event_id, seat_number, seat_id_data, seat_type, quantity, price, transactionRef) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO booking (first_name, last_name, email_address, user_id, event_id, seat_number, seat_id_data, seat_type, quantity, price, transactionRef) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssiisssiis", $first_name, $last_name, $email_address, $user_id, $event_id, $seat_numbers, $serilizedData, $seat_name, $quantity, $seat_price, $transactionRef);
     $stmt->execute();
     $booking_id = $stmt->insert_id;
@@ -152,13 +136,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $qrCodeURL = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" . urlencode($qrData);
 
     // Ensure QR Code is stored in the database
-    $stmt = $conn->prepare("UPDATE bookings SET qr_code = ? WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE booking SET qr_code = ? WHERE id = ?");
     $stmt->bind_param("si", $qrCodeURL, $booking_id);
     $stmt->execute();
     $stmt->close();
 
 
-    $stmt = $conn->prepare("SELECT * FROM bookings WHERE  id = ?");
+    $stmt = $conn->prepare("SELECT * FROM booking WHERE  id = ?");
     $stmt->bind_param("i", $booking_id);
     $stmt->execute();
 

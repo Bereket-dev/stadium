@@ -11,7 +11,7 @@ if (isset($_GET["id"]) && filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
     header("Location: product-management.php");
     exit();
 }
-$stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
+$stmt = $conn->prepare("SELECT * FROM product WHERE id = ?");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
 
@@ -24,7 +24,7 @@ if (!$product) {
 }
 $stmt->close();
 
-$stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+$stmt = $conn->prepare("DELETE FROM product WHERE id = ?");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
 $conn->close();
