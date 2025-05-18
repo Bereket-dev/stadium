@@ -4,13 +4,21 @@ $sql = "SELECT * FROM user ";
 $result = $conn->query(query: $sql);
 $totalUsers = $result->num_rows;
 
-$sql = "SELECT * FROM booking ";
+$sql = "SELECT * FROM booking WHERE `status` = 'confirmed'";
 $result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
-
 $confirmedRevenue = 0;
 foreach ($result as $row) {
-  $confirmedRevenue += (int)$row["price"];
+  $seattype_id = $result["seattype_id"];
+
+  $stmt_event = $conn->prepare("SELECT * FROM `seattype` WHERE id = ?");
+  $stmt_event->bind_param("i", $seattype_id);
+  $stmt_event->execute();
+  $result = $stmt_event->get_result();
+  $price = $result->fetch_assoc()["seat_price"];
+
+  $confirmedRevenue += $price;
 }
+
 
 
 $sql = "SELECT * FROM booking WHERE `status` = 'confirmed'";
@@ -28,12 +36,12 @@ $sql = "SELECT seat_amount, seat_price FROM seattype";
 $result = $conn->query($sql);
 
 if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $projectedRevenue += (int)$row['seat_amount'] * (float)$row['seat_price'];
-    }
+  while ($row = $result->fetch_assoc()) {
+    $projectedRevenue += (int)$row['seat_amount'] * (float)$row['seat_price'];
+  }
 } else {
-    // Handle error or no results
-    $projectedRevenue = 0;
+  // Handle error or no results
+  $projectedRevenue = 0;
 }
 
 

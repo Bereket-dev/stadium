@@ -11,6 +11,11 @@
     margin-top: 100px;
 }
 
+.ticket-img {
+    width: 50px;
+    transform: rotateZ(-80deg);
+}
+
 /* card style */
 .card {
     height: 450px;

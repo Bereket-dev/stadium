@@ -18,47 +18,47 @@ if (isset($_GET["id"]) && filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
     exit();
 }
 
-$stmt = $conn->prepare("SELECT * FROM bookings WHERE  id = ?");
+$stmt = $conn->prepare("SELECT * FROM booking WHERE  id = ?");
 $stmt->bind_param("i", $booking_id);
 $stmt->execute();
 
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
-$first_name = $row["first_name"];
-$last_name = $row["last_name"];
-$seat_name  = $row["seat_type"];
-$seat_price = $row["price"];
-$booking_qr  =  $row["qr_code"];
-$seat_status  = $row["status"];
-$status = $row["status"];
-
+$user_id = $row["user_id"];
+$seattype_id = $row["seattype_id"];
 $seat_number = $row["seat_number"];
-$event_id = $row["event_id"];
-
-$fullName = $first_name . " " . $last_name;
-//for confirmation maile
-$email_address = $row["email_address"];
+$booking_qr  =  $row["qr_code"];
+$status = $row["status"];
 
 $stmt->close();
 
-
-
-$stmt = $conn->prepare("SELECT * FROM events WHERE  id = ?");
-$stmt->bind_param("i", $event_id);
+$stmt = $conn->prepare("SELECT * FROM seattype WHERE  id = ?");
+$stmt->bind_param("i", $seattype_id);
 $stmt->execute();
 
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
+$seat_name = $row["seat_name"];
+$seat_price = $row["seat_price"];
+
+$event_id = $row["event_id"];
+$stmt->close();
+
+$stmt = $conn->prepare("SELECT * FROM `event` WHERE  id = ?");
+$stmt->bind_param("i", $event_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
 $event_name = $row["event_name"];
 $event_date = $row["event_date"];
-
 $stadium_id = $row["stadium_id"];
 
 $stmt->close();
 
-$stmt = $conn->prepare("SELECT * FROM stadiums WHERE  id = ?");
+$stmt = $conn->prepare("SELECT * FROM stadium WHERE  id = ?");
 $stmt->bind_param("i", $stadium_id);
 $stmt->execute();
 
@@ -66,6 +66,20 @@ $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 $stadium_name = $row["stadium_name"];
+$stmt->close();
+
+$stmt = $conn->prepare("SELECT * FROM user WHERE  id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+$first_name = $row["first_name"];
+$last_name = $row["last_name"];
+$email = $row["email"];
+
+$fullName = $first_name . " " . $last_name;
 $stmt->close();
 $conn->close();
 ?>
@@ -105,8 +119,11 @@ $conn->close();
             <div class="d-flex justify-content-between border-bottom border-dark mb-3">
                 SEAT NUMBER: <span><?php echo $seat_number; ?></span>
             </div>
-            <div class="d-flex justify-content-between border-bottom border-dark mb-5">
+            <div class="d-flex justify-content-between border-bottom border-dark mb-3">
                 PRCIE: <span><?php echo $seat_price . " ETB"; ?></span>
+            </div>
+            <div class="d-flex justify-content-between border-bottom border-dark mb-4">
+                Event Date: <span><?php echo $event_date . " ETB"; ?></span>
             </div>
             <div class="text-center">
                 <?php

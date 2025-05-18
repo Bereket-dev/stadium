@@ -12,10 +12,11 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     } else {
         $_SESSION["event_id"] = $_GET['id'];
     }
-    
 }
 
 $event_id = $_SESSION["event_id"] ?? null;
+
+
 
 // Fetch event details
 $stmt = $conn->prepare("SELECT * FROM `event` WHERE id = ?");
@@ -34,105 +35,58 @@ if (!$event) {
 // When form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $first_name = trim($_POST["first_name"] ?? "");
-    $last_name = trim($_POST["last_name"] ?? "");
-    $email_address = trim($_POST["email_address"] ?? "");
-    $transactionRef = trim($_POST["transactionRef"] ?? "");
-    $quantity = $_POST["quantity"] ?? null;
-    if (!$quantity) {
-        $message = "no quantity post";
-    }
-    $price = $_POST["price"] ?? null;
-    if (!$price) {
-        $message = 'no price post';
-        goto form;
-    }
-    if (empty($first_name) || empty($last_name) || empty($email_address) || empty($transactionRef)) {
-        $message = "All fields are required";
-        goto form;
+    $seattype_id = $_POST["seattype_id"] ?? null;
+    $transactionRef = $_POST["transactionRef"] ?? null;
+    if (empty($transactionRef) || !$seattype_id) {
+        $_SESSION["message"] = "All fields are required";
+        exit(1);
     }
 
-    $username = $_SESSION["username"] ?? null;
-    if (!$username) {
-        exit("User not logged in.");
-    }
-
-    $event_id = $_SESSION["event_id"] ?? null;
-    $seat_price = $_SESSION["seat_price"] ?? null;
-    $seat_price *= $quantity;
-    $seat_name = $_SESSION["seat_name"] ?? null;
-    $seattype_id = $_SESSION["seattype_id"] ?? null;
-
-
-
-    // Fetch user ID
-    $stmt = $conn->prepare("SELECT id FROM `user` WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $user_id = $stmt->get_result()->fetch_assoc()["id"] ?? null;
-    $stmt->close();
+    $user_id = $_SESSION["user_id"] ?? null;
 
     if (!$user_id) {
         exit("User not found.");
     }
 
-    // Fetch available seat
-    $stmt = $conn->prepare("SELECT * FROM `seat` WHERE seattype_id = ? AND seat_status = 'available' AND event_id = ? LIMIT ?");
-    $stmt->bind_param("iii", $seattype_id, $event_id, $quantity);
+    $stmt = $conn->prepare("SELECT * FROM `seat` WHERE seat_status = 'available' AND seattype_id = ?");
+    $stmt->bind_param("i", $seattype_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    if ($result->num_rows === 0) {
-        $message = "<div class='text-center'>No available seats.</div>";
-        goto form;
-    } else if ($result->num_rows < $quantity) {
-        $message = 'only ' . $result->num_rows . ' ' . $seat_name . ' seats are available!';
-        goto form;
-    } //initiallize
-    $seat_numArray = [];
-    $seat_idArray = [];
-    $stadium_ids = [];
-    while ($seat = $result->fetch_assoc()) {
-        $seat_numArray[] = $seat["seat_number"];
-        $seat_idArray[] = $seat["id"];
-        $stadium_ids[] = $seat["stadium_id"];
-    }
+    $seat = $result->fetch_assoc();
+    $seat_id = $seat["id"];
+    $available_number = $seat["number"];
+    $available_number--; //decrease since it will add to selected
 
-    $seat_numbers = implode(", ", $seat_numArray); // changing array in to string
-
-    $stadium_id = $stadium_ids[0]; //just using only one id since all are similar
-    $stmt->close();
-
-
-    // Update seat status
-    foreach ($seat_idArray as $seat_id) {
-        $stmt = $conn->prepare("UPDATE `seat` SET seat_status = 'selected' WHERE id = ?");
-        $stmt->bind_param("i", $seat_id);
-        $stmt->execute();
-        $stmt->close();
-    }
-    $serilizedData = json_encode($seat_idArray); //serilizing to store it in booking table
-
-    // Fetch stadium name
-    $stmt = $conn->prepare("SELECT stadium_name FROM stadium WHERE id = ?");
-    $stmt->bind_param("i", $stadium_id);
+    // Update seat number on specific status
+    $stmt = $conn->prepare("UPDATE `seat` SET `number` = ?  WHERE id = ? AND seat_status = 'available'");
+    $stmt->bind_param("ii", $available_number, $seat_id);
     $stmt->execute();
-    $stadium_name = $stmt->get_result()->fetch_assoc()["stadium_name"] ?? "Unknown";
     $stmt->close();
 
+    $stmt = $conn->prepare("SELECT * FROM `seat` WHERE seat_status = 'selected' AND seattype_id = ?");
+    $stmt->bind_param("i", $seattype_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $seat = $result->fetch_assoc();
+    $seat_id = $seat["id"];
+    $selected_number = $seat["number"];
+    $selected_number++;
 
-    if ($seat_price != $price) {
-        exit("Don't try to cheat!");
-    }
+    $stmt = $conn->prepare("UPDATE `seat` SET `number` = ?  WHERE id = ? AND seat_status = 'selected'");
+    $stmt->bind_param("ii", $selected_number, $seat_id);
+    $stmt->execute();
+    $stmt->close();
 
+    $seat_number = $selected_number;
     // Insert booking record
-    $stmt = $conn->prepare("INSERT INTO booking (first_name, last_name, email_address, user_id, event_id, seat_number, seat_id_data, seat_type, quantity, price, transactionRef) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssiisssiis", $first_name, $last_name, $email_address, $user_id, $event_id, $seat_numbers, $serilizedData, $seat_name, $quantity, $seat_price, $transactionRef);
+    $stmt = $conn->prepare("INSERT INTO booking (user_id, seat_number, seattype_id, transactionRef) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("iiis", $user_id, $seat_number, $seattype_id, $transactionRef);
     $stmt->execute();
     $booking_id = $stmt->insert_id;
     $stmt->close();
 
     // Generate QR Code with actual booking details
-    $qrData = "Booking ID: $booking_id\nStadium: $stadium_name\nEvent: $event_name\nSeat: $seat_name\nPrice: $seat_price";
+    $qrData = "Booking ID: $booking_id";
     $qrCodeURL = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" . urlencode($qrData);
 
     // Ensure QR Code is stored in the database
@@ -186,74 +140,70 @@ form:
             <a href="./users/users.event.calendar.php" class="btn btn-primary">Book An Event</a>
         </div>
     </div>
-    <?php echo '<p class ="text-center">' . $message . '</p>'; ?>
-    <!--ticket selecting area-->
-    <div class="container frames col-6">
-        <div class="row border border-primary p-3">
-            <div class="col-3">Seat Type</div>
-            <div class="col-3">Price</div>
-            <div class="col-3">Quantity</div>
+    <form class="g-3" method="post" action="">
+        <?php echo '<p class ="text-center">' . $message . '</p>'; ?>
+        <!--ticket selecting area-->
+        <div class="container frames col-6">
+            <div class="row border border-primary text-center p-3">
+                <div class="col-4">Seat Type</div>
+                <div class="col-4">Price</div>
+                <div class="col-4">Status</div>
+            </div>
+
+            <?php
+            $stmt = $conn->prepare('SELECT * FROM seattype WHERE event_id = ?');
+            $stmt->bind_param("i", $event_id);
+            $stmt->execute();
+            $results = $stmt->get_result();
+
+
+            while ($row = $results->fetch_assoc()) {
+                $stmt = $conn->prepare('SELECT * FROM `seat` WHERE seattype_id = ?');
+                $stmt->bind_param("i", $row["id"]);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $status = ($result->fetch_assoc()["number"] > 0) ? "<div class='col-4 text-green'>Available</div>" : "<div class='col-4 text-red' disabled>Not Available</div>";
+
+                echo '<div class="row border-bottom border-primary p-3 text-center  align-items-center">';
+
+                // Column for checkbox
+                echo '<div class="col-auto">';
+                echo '<input class="form-check-input" required type="radio" name="seattype_id" value="' . $row["id"] . '" id="checkDefault">';
+                echo '</div>';
+
+                // Column for label (which wraps the rest)
+                echo '<div class="col px-0 d-flex align-items-center">';
+
+                // Seat name
+                echo '<div class="col-3">' . $row["seat_name"] . '</div>';
+
+                // seat price
+                echo '<div class="col-5">' . $row["seat_price"] . ' ETB</div>';
+
+                // Seat status
+                echo $status;
+
+                echo '</div>'; // close main col
+                echo '</div>'; // close row
+            };
+            $stmt->close();
+            ?>
+
         </div>
+        <!-- booking form -->
+        <div class="container col-6 mt-5 p-5 banner-container" style="box-shadow: 1px 1px 3px black;">
+            <div class="text-center fs-3 mb-3"><?php echo $event["event_name"]; ?></div>
 
-        <?php
-        $stmt = $conn->prepare('SELECT * FROM seattype WHERE event_id = ?');
-        $stmt->bind_param("i", $event_id);
-        $stmt->execute();
-        $results = $stmt->get_result();
-        while ($row = $results->fetch_assoc()) {
-            echo '<div class="row border-bottom border-primary p-3 input-area">';
-            echo '<div class="col-3 stattype-area">' . $row["seat_name"] . '</div>';
-            echo '<div class="col-3">' . $row["seat_price"] . '</div>';
-            echo '<input type="number" class="price-area" value="' . $row["seat_price"] . '" hidden>';
-            echo '<div class="col-3 quantity-area">0</div>';
-            echo '<div class="col-3 row">';
-            echo '<div class="col-4 btn btn-outline-primary remove-ticket">-</div>';
-            echo '<div class="col-4 ms-2 btn btn-primary add-ticket">+</div>';
-            echo '</div></div>';
-        };
-        $stmt->close();
-        ?>
-
-        <div class="mt-3">Total Price <span id="totalPrice">0</span></div>
-    </div>
-    <!-- booking form -->
-    <div class="container col-6 mt-5 p-5 banner-container" style="box-shadow: 1px 1px 3px black;">
-        <div class="text-center fs-3 mb-3"><?php echo $event["event_name"]; ?></div>
-        <form class="row g-3" method="post" action="">
-            <div class="col-md-6">
-                <label for="validationCustom01" class="form-label">First name</label>
-                <input type="text" class="form-control" name="first_name" id="" required placeholder="MARK">
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
-            </div>
-            <div class="col-md-6">
-                <label for="validationCustom02" class="form-label">Last name</label>
-                <input type="text" class="form-control" name="last_name" id="" required placeholder="Otto">
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="exampleFormControlInput1" class="form-label">Email address</label>
-                <input type="email" class="form-control" name="email_address" id="exampleFormControlInput1" placeholder="name@example.com" required>
-            </div>
             <div class="mb-3">
                 <label for="exampleFormControlInput2" class="form-label">Transaction Ref:</label>
                 <input type="text" class="form-control" name="transactionRef" id="exampleFormControlInput2" placeholder="" required>
             </div>
-            <input type="hidden" name="price" id="priceInput">
-            <input type="hidden" name="quantity" id="quantityInput">
 
-
-            <input type="hidden" name="id" value="<?php echo $booking_id; ?>" required>
             <div class="col-12">
                 <button type="submit" class="mt-2 btn btn-primary">Book</button>
             </div>
-        </form>
-    </div>
-
+        </div>
+    </form>
     <!-- footer -->
     <?php include '../includes/footer.php'; ?>
     <script

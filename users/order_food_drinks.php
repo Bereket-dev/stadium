@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="row  justify-content-center frames">
         <?php
 
-        $sql = 'SELECT * FROM products';
+        $sql = 'SELECT * FROM product';
         $result = $conn->query($sql);
         while ($product = $result->fetch_assoc()) {
             echo '<div id = " class="col-auto m-2" style="width: max-content">';
@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo '<div class="horizontal-line"></div>';
             echo '<div class="justify-content-between align-items-end">';
 
-            $stmt2 = $conn->prepare("SELECT `status` FROM orders WHERE user_id = ? AND product_id = ?");
+            $stmt2 = $conn->prepare("SELECT `status` FROM `order` WHERE user_id = ? AND product_id = ?");
             $stmt2->bind_param("ii", $user_id, $product["id"]);
             $stmt2->execute();
 
@@ -120,6 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo '<button type="" value = "" class="btn btn-secondary me-2 mb-2" style="font-size: 14px;">Pending</button>';
                 } else if ($order["status"] == 'cancelled') {
                     echo '<button type="" value = "" class="btn btn-secondary me-2 mb-2" style="font-size: 14px;">Cancelled</button>';
+                } else if ($order["status"] == 'delivered') {
+                    echo '<button type="" value = "" class="btn btn-secondary me-2 mb-2" style="font-size: 14px;">delivered</button>';
                 }
             } else  if ($orderresult->num_rows == 0) {
                 echo '<button type="button" onClick="showHiddenForm(' . $product["id"] . ')" class="btn btn-primary order-add-' . $product["id"] . ' me-2 mb-2" style="font-size: 14px;">Order -></button>';

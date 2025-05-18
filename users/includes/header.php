@@ -57,9 +57,10 @@ $is_loged_in = isset($_SESSION["user_id"]) ?  true : false ?>
             </ul>
           </li>
         </ul>
-        <div class="align-items-center gap-3 btn">
+        <div class="align-items-center gap-3">
           <?php if ($is_loged_in) {
             echo '<a href="../auth/logout.php" class="btn btn-outline-success bg-white" style="font-size: 20px; border-radius: 7px;">Logout</a>';
+            echo '<a href="../users/booked_tickets.php" ><img class="image-fluid ticket-img" src="../assets/Images/Icon/ticket.png"></img></a>';
           } else {
             echo '<a href="../auth/login.php" class="btn btn-success" style="font-size: 20px; border-radius: 7px;">SignIn</a>';
           } ?>
