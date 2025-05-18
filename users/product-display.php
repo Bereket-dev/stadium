@@ -1,4 +1,4 @@
-<?php 
+<?php
 include './database/db.php'; //include database connection
 include 'includes/auth.user.php';
 
@@ -92,6 +92,8 @@ $user_id = isset($_SESSION["user_id"]) ? $_SESSION["user_id"] : null; ?>
                 echo '<button type="" value = "" class="btn btn-secondary me-2 mb-2" style="font-size: 14px;">Pending</button>';
             } else if ($order["status"] == 'cancelled') {
                 echo '<button type="" value = "" class="btn btn-secondary me-2 mb-2" style="font-size: 14px;">Cancelled</button>';
+            } else if ($order["status"] == 'delivered') {
+                echo '<button type="" value = "" class="btn btn-secondary me-2 mb-2" style="font-size: 14px;">delivered</button>';
             }
         } else  if ($orderresult->num_rows == 0) {
             echo '<button type="button" onClick="showHiddenForm(' . $product["id"] . ')" class="btn btn-primary order-add-' . $product["id"] . ' me-2 mb-2" style="font-size: 14px;">Order -></button>';

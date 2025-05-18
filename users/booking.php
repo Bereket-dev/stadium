@@ -56,12 +56,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $seat_id = $seat["id"];
     $available_number = $seat["number"];
     $available_number--; //decrease since it will add to selected
-
-    // Update seat number on specific status
-    $stmt = $conn->prepare("UPDATE `seat` SET `number` = ?  WHERE id = ? AND seat_status = 'available'");
-    $stmt->bind_param("ii", $available_number, $seat_id);
-    $stmt->execute();
-    $stmt->close();
+    if (!isset($_SESSION["isupdated"])) {
+        // Update seat number on specific status
+        $stmt = $conn->prepare("UPDATE `seat` SET `number` = ?  WHERE id = ? AND seat_status = 'available'");
+        $stmt->bind_param("ii", $available_number, $seat_id);
+        if ($stmt->execute()) {
+            $_SESSION["isupdated"] = true;
+        }
+        $stmt->close();
+    }
 
     $stmt = $conn->prepare("SELECT * FROM `seat` WHERE seat_status = 'selected' AND seattype_id = ?");
     $stmt->bind_param("i", $seattype_id);
@@ -72,11 +75,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $selected_number = $seat["number"];
     $selected_number++;
 
-    $stmt = $conn->prepare("UPDATE `seat` SET `number` = ?  WHERE id = ? AND seat_status = 'selected'");
-    $stmt->bind_param("ii", $selected_number, $seat_id);
-    $stmt->execute();
-    $stmt->close();
-
+    if (!isset($_SESSION["isupdated"])) {
+        $stmt = $conn->prepare("UPDATE `seat` SET `number` = ?  WHERE id = ? AND seat_status = 'selected'");
+        $stmt->bind_param("ii", $selected_number, $seat_id);
+        if ($stmt->execute()) {
+            $_SESSION["isupdated"] = true;
+        }
+        $stmt->close();
+    }
     $seat_number = $selected_number;
     // Insert booking record
     $stmt = $conn->prepare("INSERT INTO booking (user_id, seat_number, seattype_id, transactionRef) VALUES (?, ?, ?, ?)");
@@ -109,8 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     unset($_POST["email_address"]);
     unset($_POST["first_name"]);
     unset($_POST["last_name"]);
-
-
+    unset($_SESSION["isupdated"]);
     exit();
 }
 form:

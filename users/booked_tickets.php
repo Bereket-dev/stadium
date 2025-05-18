@@ -31,7 +31,7 @@ if (!$user_id) {
 
     <div class="container frames">
         <?php
-        $stmt_booking = $conn->prepare("SELECT * FROM booking WHERE user_id = ?");
+        $stmt_booking = $conn->prepare("SELECT * FROM booking WHERE user_id = ? ORDER BY booking_date DESC");
         $stmt_booking->bind_param("i", $user_id);
         $stmt_booking->execute();
         $result_booking = $stmt_booking->get_result();

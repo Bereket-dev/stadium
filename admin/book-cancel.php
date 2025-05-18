@@ -19,7 +19,7 @@ if (isset($_GET["id"]) && filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
     exit();
 }
 
-$stmt = $conn->prepare("SELECT * FROM bookings WHERE  id = ?");
+$stmt = $conn->prepare("SELECT * FROM booking WHERE  id = ?");
 $stmt->bind_param("i", $booking_id);
 $stmt->execute();
 
@@ -27,22 +27,46 @@ $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 $book_status = $row["status"];
-if ($book_status == 'pending') {
-    $seat_idArray = json_decode($row["seat_id_data"], true);
+$seattype_id = $row["seattype_id"];
+if ($book_status == 'pending' && !isset($_SESSION["issupdated"])) {
     // Update seat status
-    foreach ($seat_idArray as $seat_id) {
-        $stmt = $conn->prepare("UPDATE seats SET seat_status = 'available' WHERE id = ?");
-        $stmt->bind_param("i", $seat_id);
-        $stmt->execute();
-        $stmt->close();
-    }
+    $stmt = $conn->prepare("SELECT * FROM `seat` WHERE seat_status = 'selected' AND seattype_id = ?");
+    $stmt->bind_param("i", $seattype_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $seat = $result->fetch_assoc();
+    $seat_id = $seat["id"];
+    $selected_number = $seat["number"];
+    $selected_number--;
 
-    $stmt = $conn->prepare("UPDATE bookings SET `status` = 'cancelled' WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE seat SET `number` = ? WHERE id = ?");
+    $stmt->bind_param("ii", $selected_number, $seat_id);
+    if ($stmt->execute()) {
+        $_SESSION["isupdate"] = true;
+    }
+    $stmt->close();
+
+    $stmt = $conn->prepare("SELECT * FROM `seat` WHERE seat_status = 'available' AND seattype_id = ?");
+    $stmt->bind_param("i", $seattype_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $seat = $result->fetch_assoc();
+    $seat_id = $seat["id"];
+    $available_number = $seat["number"];
+    $available_number++;
+
+    $stmt = $conn->prepare("UPDATE seat SET `number` = ? WHERE id = ?");
+    $stmt->bind_param("ii", $available_number, $seat_id);
+    $stmt->execute();
+    $stmt->close();
+
+
+    $stmt = $conn->prepare("UPDATE booking SET `status` = 'cancelled' WHERE id = ?");
     $stmt->bind_param("i", $booking_id);
     $stmt->execute();
     $stmt->close();
 } else if ($book_status === 'cancelled') {
-    $stmt = $conn->prepare("DELETE FROM bookings  WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM booking  WHERE id = ?");
     $stmt->bind_param("i", $booking_id);
     $stmt->execute();
     $stmt->close();

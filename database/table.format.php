@@ -23,7 +23,6 @@ $sql = "CREATE TABLE IF NOT EXISTS `stadium` (
   `city` varchar(255) NOT NULL,
   `region` varchar(255) NOT NULL,
   `postal_code` varchar(255) NOT NULL,
-  `total_seats` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ";
@@ -54,6 +53,7 @@ $sql = "CREATE TABLE IF NOT EXISTS `seattype` (
   `event_id` int(11) NOT NULL,
   `seat_amount` int(11) NOT NULL,
   `seat_price` float NOT NULL,
+  `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `event_id` (`event_id`),
   CONSTRAINT `seattype_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`) ON DELETE CASCADE

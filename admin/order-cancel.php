@@ -28,4 +28,5 @@ if ($order_status == 'pending' || $order_status == 'processing') {
 }
 $_SESSION["message"] = '';
 header("Location: ./product-management.php");
+unset($_SESSION["isupdated"]);
 exit();

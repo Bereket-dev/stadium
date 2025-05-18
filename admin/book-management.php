@@ -44,17 +44,18 @@ include './includes/auth.admin.php';
                 <div class="col-1"></div>
             </div>
             <?php
-            $sql = "SELECT * FROM booking";
+            $sql = "SELECT * FROM booking ORDER BY `status`, booking_date DESC";
             $result = $conn->query($sql);
             while ($row = $result->fetch_assoc()) {
-                
-                $stmt_event = $conn->prepare("SELECT * FROM `user` WHERE id = ?");
-                $stmt_event->bind_param("i", $row["id"]);
-                $stmt_event->execute();
-                $result_event = $stmt_event->get_result();
-                $event = $result_event->fetch_assoc();
+
+                $stmt = $conn->prepare("SELECT * FROM `user` WHERE id = ?");
+                $stmt->bind_param("i", $row["user_id"]);
+                $stmt->execute();
+                $userresult = $stmt->get_result();
+                $email_address = $userresult->fetch_assoc()["email"];
+
                 echo '<div class="row   border-top mt-2">';
-                echo  '<div class="col">' . $row["email_address"] . '</div>';
+                echo  '<div class="col">' . $email_address . '</div>';
                 echo    '<div class="col-2">' . $row["booking_date"] . '</div>';
                 echo   '<div class="col-2">' . $row["status"] . '</div>';
                 echo   '<div class="col-2">' . $row["transactionRef"] . '</div>';

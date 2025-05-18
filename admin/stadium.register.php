@@ -125,7 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
 
-    $stmt = $conn->prepare("INSERT INTO event(event_name, event_date, stadium_id, event_description, layout_image) VALUES(?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO `event`(event_name, event_date, stadium_id, event_description, layout_image) VALUES(?, ?, ?, ?, ?)");
     $stmt->bind_param("ssiss", $event_name, $event_date, $stadium_id, $event_description, $image_name);
     $stmt->execute();
 

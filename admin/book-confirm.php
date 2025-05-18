@@ -29,38 +29,28 @@ if (isset($_GET["id"]) && filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
 }
 
 // Fetch booking details
-$stmt = $conn->prepare("SELECT * FROM bookings WHERE id = ?");
+$stmt = $conn->prepare("SELECT * FROM booking WHERE id = ?");
 $stmt->bind_param("i", $booking_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
+$book_status = $row["status"];
+$seattype_id  = $row["seattype_id"];
 $stmt->close();
+
 
 if (!$row) {
     die("Booking not found.");
 }
 
-// Assign booking details
-$first_name = $row["first_name"];
-$last_name = $row["last_name"];
-$seat_name = $row["seat_type"];
-$seat_price = $row["price"];
-$booking_qr = $row["qr_code"];
-$book_status = $row["status"];
-$seat_number = $row["seat_number"];
-$event_id = $row["event_id"];
-$email_address = $row["email_address"];
-$seat_idArray = json_decode($row["seat_id_data"], true);
-$fullName = $first_name . " " . $last_name;
-
 // Check booking status and update
 if ($book_status == 'pending') {
-    $stmt = $conn->prepare("UPDATE bookings SET `status` = 'confirmed' WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE booking SET `status` = 'confirmed' WHERE id = ?");
     $stmt->bind_param("i", $booking_id);
     $stmt->execute();
     $stmt->close();    // Re-fetch the updated status
 
-    $stmt = $conn->prepare("SELECT `status` FROM bookings WHERE id = ?");
+    $stmt = $conn->prepare("SELECT `status` FROM booking WHERE id = ?");
     $stmt->bind_param("i", $booking_id);
     $stmt->execute();
     $stmt->bind_result($book_status);
@@ -71,16 +61,78 @@ if ($book_status == 'pending') {
     $issent = true;
 }
 
-// Update seat status
-foreach ($seat_idArray as $seat_id) {
-    $stmt = $conn->prepare("UPDATE seats SET seat_status = 'booked' WHERE id = ?");
-    $stmt->bind_param("i", $seat_id);
+if (!$issent) {
+    // Update seat number based on status
+    $stmt = $conn->prepare("SELECT * FROM `seat` WHERE seat_status = 'selected' AND seattype_id = ?");
+    $stmt->bind_param("i", $seattype_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $seat = $result->fetch_assoc();
+    $seat_id = $seat["id"];
+    $selected_number = $seat["number"];
+    $selected_number--;
+
+    $stmt = $conn->prepare("UPDATE `seat` SET `number` = ?  WHERE id = ? AND seat_status = 'selected'");
+    $stmt->bind_param("ii", $selected_number, $seat_id);
+    $stmt->execute();
+    $stmt->close();
+
+    $stmt = $conn->prepare("SELECT * FROM `seat` WHERE seat_status = 'booked' AND seattype_id = ?");
+    $stmt->bind_param("i", $seattype_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $seat = $result->fetch_assoc();
+    $seat_id = $seat["id"];
+    $booked_number = $seat["number"];
+    $booked_number++;
+
+    $stmt = $conn->prepare("UPDATE `seat` SET `number` = ?  WHERE id = ? AND seat_status = 'booked'");
+    $stmt->bind_param("ii", $booked_number, $seat_id);
+    $stmt->execute();
+    $stmt->close();
+
+    $stmt = $conn->prepare("UPDATE booking SET seat_number = ? WHERE id = ?");
+    $stmt->bind_param("ii", $booked_number, $booking_id);
     $stmt->execute();
     $stmt->close();
 }
 
+// Fetch booking details
+$stmt = $conn->prepare("SELECT * FROM booking WHERE id = ?");
+$stmt->bind_param("i", $booking_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$book_status = $row["status"];
+$seattype_id = $row["seattype_id"];
+$user_id = $row["user_id"];
+$seat_number = $row["seat_number"];
+$booking_qr = $row["qr_code"];
+$stmt->close();
+
+$stmt = $conn->prepare("SELECT * FROM user WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$first_name = $row["first_name"];
+$first_name = $row["first_name"];
+$email_address = $row["email"];
+$stmt->close();
+
+$fullName = $first_name . " " . $last_name;
+
+$stmt = $conn->prepare("SELECT * FROM seattype WHERE id = ?");
+$stmt->bind_param("i", $seattype_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$event_id = $row["event_id"];
+$seat_type = $row["seat_name"];
+$stmt->close();
+
 // Fetch event details
-$stmt = $conn->prepare("SELECT * FROM events WHERE id = ?");
+$stmt = $conn->prepare("SELECT * FROM `event` WHERE id = ?");
 $stmt->bind_param("i", $event_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -96,7 +148,7 @@ $event_date = $row["event_date"];
 $stadium_id = $row["stadium_id"];
 
 // Fetch stadium details
-$stmt = $conn->prepare("SELECT * FROM stadiums WHERE id = ?");
+$stmt = $conn->prepare("SELECT * FROM stadium WHERE id = ?");
 $stmt->bind_param("i", $stadium_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -112,7 +164,6 @@ $stadium_name = $row["stadium_name"];
 
 // Send confirmation email if not already sent
 if ($book_status == "confirmed" && !$issent) {
-
 
     // Include PHPMailer files
     require '../PHPMailer-master/src/PHPMailer.php';

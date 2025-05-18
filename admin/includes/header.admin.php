@@ -6,9 +6,12 @@ $totalUsers = $result->num_rows;
 
 $sql = "SELECT * FROM booking WHERE `status` = 'confirmed'";
 $result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+
 $confirmedRevenue = 0;
+$totalBookings = 0;
+
 foreach ($result as $row) {
-  $seattype_id = $result["seattype_id"];
+  $seattype_id = $row["seattype_id"];
 
   $stmt_event = $conn->prepare("SELECT * FROM `seattype` WHERE id = ?");
   $stmt_event->bind_param("i", $seattype_id);
@@ -17,15 +20,7 @@ foreach ($result as $row) {
   $price = $result->fetch_assoc()["seat_price"];
 
   $confirmedRevenue += $price;
-}
-
-
-
-$sql = "SELECT * FROM booking WHERE `status` = 'confirmed'";
-$result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
-$totalBookings = 0;
-foreach ($result as $row) {
-  $totalBookings += (int)$row["quantity"];
+  $totalBookings++;
 }
 
 // Initialize projected revenue
